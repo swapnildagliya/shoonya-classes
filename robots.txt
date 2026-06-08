@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /semester-content-generator.html
+
+Sitemap: https://classes.shoonyadance.com/sitemap.xml
