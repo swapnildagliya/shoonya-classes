@@ -1274,7 +1274,7 @@ const WS_STYLE_DATA = {
     wear: 'Comfortable, form-fitting dancewear. Ballet shoes or socks — no street shoes in the studio.',
     bring: 'Water bottle. Small hand towel for sweat.',
     alsoStyles: [
-      { name: 'Yoga',     slug: '/yoga-lessen-in-gent',          meta: 'Tuesday · Open' },
+      { name: 'Yoga',     slug: '/yoga-lessen-in-gent',          meta: 'Tue & Wed · Open' },
       { name: 'Flamenco', slug: '/flamenco-danslessen-in-gent',   meta: 'Tuesday · L1/L2/L3' },
       { name: 'Indian Dance Technique', slug: '/indian-dance-in-belgium', meta: 'Tuesday · Open' }
     ]
@@ -1708,7 +1708,7 @@ const WS_STYLE_DATA = {
     wear: 'Comfortable dancewear. Come barefoot — no shoes in Studio Aakash.',
     bring: 'Water bottle.',
     alsoStyles: [
-      { name: 'Yoga',      slug: '/yoga-lessen-in-gent',              meta: 'Tuesday · Open' },
+      { name: 'Yoga',      slug: '/yoga-lessen-in-gent',              meta: 'Tue & Wed · Open' },
       { name: 'Bollywood', slug: '/bollywood-danslessen-in-gent',     meta: 'Thursday · L2 & L3' },
       { name: 'Flamenco',  slug: '/flamenco-danslessen-in-gent',      meta: 'Tuesday · L1/L2/L3' }
     ]
@@ -1787,6 +1787,7 @@ const WS_STYLE_DATA = {
   },
   'Yoga': {
     hook: 'A grounded, movement-based yoga practice for dancers and non-dancers alike.',
+    dropinDays: ['Wednesday'],   // Wed Yoga has drop-in packs; Tue is semester-only
     photo: 'https://images.squarespace-cdn.com/content/v1/643161d3f0077c58bb466e03/caac7860-3825-4aef-8f7e-eb3dd133c181/Dihp+yoga_Original.jpg',
     teacherLabel: 'Swapnil Dagliya',
     teacherOrigin: 'Pune, India / Ghent, Belgium',
@@ -1805,7 +1806,7 @@ const WS_STYLE_DATA = {
     alsoStyles: [
       { name: 'Indian Dance Technique', slug: '/indian-dance-in-belgium',        meta: 'Tuesday · Open' },
       { name: 'Bollyfolk',              slug: '/bollyfolk-danslessen-in-gent',   meta: 'Tuesday · Open' },
-      { name: 'Pilates voor Dansers',   slug: '/pilates-voor-dansers-gent',      meta: 'Coming soon' }
+      { name: 'Pilates for Dancers',     slug: '/pilates-voor-dansers-gent',      meta: 'Tue & Wed · Open' }
     ]
   },
   'Indian Dance Technique': {
@@ -1826,13 +1827,18 @@ const WS_STYLE_DATA = {
     wear: 'Comfortable dancewear. Come barefoot — no shoes in Studio Aakash.',
     bring: 'Water bottle.',
     alsoStyles: [
-      { name: 'Yoga',      slug: '/yoga-lessen-in-gent',             meta: 'Tuesday · Open' },
+      { name: 'Yoga',      slug: '/yoga-lessen-in-gent',             meta: 'Tue & Wed · Open' },
       { name: 'Bollyfolk', slug: '/bollyfolk-danslessen-in-gent',    meta: 'Tuesday · Open' },
       { name: 'Ballet',    slug: '/ballet-voor-volwassenen-in-gent', meta: 'Friday · L1/L2/L3' }
     ]
   },
   'Pilates for Dancers': {
     hook: 'What you learn on the mat stays with you on the dance floor.',
+    dropinDays: ['Tuesday', 'Wednesday'],   // both Pilates days offer drop-in packs
+    // Description now comes from the sheet (doGet meta.descByLevel['Open Level']).
+    // The static override was removed 2026-06-09 after the source fix:
+    // runFixWellnessDescriptions restored the full text + _normalizeStyleNamesInText
+    // no longer doubles "Pilates for Dancers". Re-add only if the sheet regresses.
     teachers: [
       { name: 'Lenka Badriyah', pageSlug: null,
         photo: 'https://images.squarespace-cdn.com/content/v1/643161d3f0077c58bb466e03/fe4cab00-85d3-484d-8b81-c279d67693b4/IsabelleHanneuse+%284%29.jpg',
@@ -1847,12 +1853,17 @@ const WS_STYLE_DATA = {
     bring: 'Water bottle. Yoga mat if you have one — mats available at Shoonya. Using a studio mat? Bring a yoga towel to lay over it. Small hand towel for sweat.',
     alsoStyles: [
       { name: 'Dance & Fit',  slug: '/dance-fit-gent',                    meta: 'Wednesday · Open' },
-      { name: 'Yoga',         slug: '/yoga-lessen-in-gent',               meta: 'Tuesday · Open' },
+      { name: 'Yoga',         slug: '/yoga-lessen-in-gent',               meta: 'Tue & Wed · Open' },
       { name: 'Raqs Sharqi',  slug: '/raqs-sharqi-danslessen-in-gent',    meta: 'Monday · L1/L2/L3' }
     ]
   },
   'Dance & Fit': {
     hook: 'A fresh and energising class that combines the joy of dance with the benefits of a full-body workout.',
+    dropinDays: ['Wednesday'],   // Dance & Fit (Wed only) offers drop-in packs
+    // Description now comes from the sheet (doGet meta.descByLevel['Open Level']).
+    // The static override was removed 2026-06-09 after runFixWellnessDescriptions
+    // added the full Dance & Fit copy to the teacher profile. Re-add only if the
+    // sheet regresses to an empty description.
     teachers: [
       { name: 'Lenka Badriyah', pageSlug: null,
         photo: 'https://images.squarespace-cdn.com/content/v1/643161d3f0077c58bb466e03/fe4cab00-85d3-484d-8b81-c279d67693b4/IsabelleHanneuse+%284%29.jpg',
@@ -1868,7 +1879,7 @@ const WS_STYLE_DATA = {
     alsoStyles: [
       { name: 'Pilates for Dancers', slug: '/pilates-voor-dansers-gent',      meta: 'Tue & Wed · Open' },
       { name: 'Raqs Sharqi',         slug: '/raqs-sharqi-danslessen-in-gent', meta: 'Monday · L1/L2/L3' },
-      { name: 'Yoga',                slug: '/yoga-lessen-in-gent',            meta: 'Tuesday · Open' }
+      { name: 'Yoga',                slug: '/yoga-lessen-in-gent',            meta: 'Tue & Wed · Open' }
     ]
   },
   'Bachata Solo Style': {
@@ -1988,9 +1999,16 @@ function wsGetStyleData(styleName) {
 const WS_REG_URL = '/register/';
 const WS_SPRING_SCHEDULE_URL = 'https://classes.shoonyadance.com/schedule-spring-2026';
 const WS_SEMESTER_DATES = 'Sep 14 – Jan 30';
-// Set to null at the start of the main semester (Sep) to hide the spring carry-over note.
-const WS_SPRING_NOTE = 'Spring 2026 classes still running';
+// Set to null once spring classes have ended to hide the spring carry-over note
+// from ALL generated blocks. Cleared 2026-06-09 — spring 2026 finished (last classes 13 Jun).
+const WS_SPRING_NOTE = null;
 const WS_ZOHO_STARTER_URL = 'https://creatorapp.zohopublic.eu/developer_shoonyadance/shoonya-dance-studio/form-perma/Workshop_Registration_Form/uOO7GVYHQEJn5dSVDz7z1nTXXeEfD0AZ4PJvtQJ0ZbMRum3tBX30zxQHC02n9b3bvTO6ORFDsVCfS4bJQF1VOZdBMZquYuPb4xx8';
+// Drop-in packs (Pilates, Dance & Fit, Wednesday Yoga). Same Zoho workshop form —
+// Zoho lists them under Festivals & Events. A style opts in via `dropinDays` in
+// WS_STYLE_DATA; the day-card for each matching day gets a drop-in pack block.
+const WS_DROPIN_URL = WS_ZOHO_STARTER_URL;
+const WS_DROPIN_PACKS = [{ n: '3 sessions', price: '€40.50' }, { n: '5 sessions', price: '€67.50' }];
+const WS_DROPIN_NOTE = 'Prefer flexibility? Pick any 3 or 5 dates from the schedule above — no semester commitment needed.';
 const WS_GOOGLE_FONTS = "https://fonts.googleapis.com/css2?family=Marcellus&family=PT+Serif:ital,wght@0,400;0,700;1,400&display=swap";
 
 // CSS prefix: short slug from style name, e.g. "Flamenco & Sevillanas" → "fs"
@@ -2815,10 +2833,27 @@ ${alsoCards}
 </div>`;
 }
 
-// ─── Per-level card HTML ───────────────────────────────────────────────────
-function wsPerLevelCard(lv, idx, meta, prefix, isStarterSeries, levelDesc) {
+// ─── Drop-in pack block (rendered under a day-card on drop-in days) ─────────
+function wsDropinSectionHtml(prefix, note) {
   const p = prefix;
-  const slots = lv.slots || [];
+  const tiles = WS_DROPIN_PACKS.map(pk =>
+    `<div class="${p}-dropin-pack"><div class="${p}-dropin-sessions">${pk.n}</div><div class="${p}-dropin-price">${pk.price}</div></div>`
+  ).join('');
+  return `<div class="${p}-dropin-section">
+            <div><p class="${p}-dropin-label">Drop-in packs</p>
+            <p class="${p}-dropin-note">${note || WS_DROPIN_NOTE}</p></div>
+            <div class="${p}-dropin-packs">${tiles}</div>
+            <a class="${p}-dropin-register dropin-register" href="${WS_DROPIN_URL}" target="_blank" rel="noopener">Book drop-in pack →</a>
+          </div>`;
+}
+
+// ─── Per-level card HTML ───────────────────────────────────────────────────
+// opts (optional): { slotOverride, title, dropinHtml, semesterOnly } — used by
+// drop-in styles to render one card per day-slot with a drop-in / semester note.
+function wsPerLevelCard(lv, idx, meta, prefix, isStarterSeries, levelDesc, opts) {
+  opts = opts || {};
+  const p = prefix;
+  const slots = (opts.slotOverride ? [opts.slotOverride] : lv.slots) || [];
   const slot = slots[0] || {};
   const sc    = lv.sessionCount || WS_STD_SESSIONS;
   // Canonical price from slot duration (correct even when multiple levels share one meta.fullPrice)
@@ -2843,8 +2878,8 @@ function wsPerLevelCard(lv, idx, meta, prefix, isStarterSeries, levelDesc) {
     }
   }
 
-  const levelName = lv.level || ('Level ' + (idx + 1));
-  const isL2plus = /level [2-9]|l[2-9]/i.test(levelName);
+  const levelName = opts.title || lv.level || ('Level ' + (idx + 1));
+  const isL2plus = /level [2-9]|l[2-9]/i.test(opts.title ? (lv.level || '') : levelName);
   const _lvNum = parseInt((levelName.match(/\d+/) || [])[0]);
   const _l2Label = _lvNum >= 4 ? 'Advanced' : _lvNum === 3 ? 'Intermediate' : 'Prior experience needed';
   const badgeClass = isStarterSeries ? '' : (isL2plus ? `${p}-badge-l2` : '');
@@ -2893,13 +2928,15 @@ function wsPerLevelCard(lv, idx, meta, prefix, isStarterSeries, levelDesc) {
           ${descBlock}
           <div class="${p}-level-meta">
             <div class="${p}-meta-item"><strong>When</strong><span>${whenHtml}</span></div>
-            <div class="${p}-meta-item"><strong>Where</strong><span>${slot.studio ? 'Studio ' + slot.studio : '?'}</span></div>
+            <div class="${p}-meta-item"><strong>Where</strong><span>${slot.studio ? 'Studio ' + String(slot.studio).replace(/^Studio\s+/i, '') : '?'}</span></div>
             <div class="${p}-meta-item"><strong>Teacher</strong><span>${slot.teacher || '?'}${slot.coTeachers ? ' & ' + slot.coTeachers : ''}</span></div>
             <div class="${p}-meta-item"><strong>Duration</strong><span>${slot.duration || '?'} min</span></div>
           </div>
           ${datesHtml}
           ${priceLabel}
-          <a class="${p}-register-link register-link" href="${registerUrl}">Register →</a>
+          ${opts.semesterOnly ? `<p class="${p}-semester-only-note">Semester registration only</p>` : ''}
+          <a class="${p}-register-link register-link" href="${registerUrl}">${opts.dropinHtml ? 'Register for semester →' : 'Register →'}</a>
+          ${opts.dropinHtml || ''}
         </div>`;
 }
 
@@ -2969,7 +3006,7 @@ function wsDayCard(dayName, dayLevels, meta, prefix, descs) {
           <hr style="border:none;border-top:1px solid #e4e0db;margin:.85rem 0;">
           <div class="${p}-level-meta">
             <div class="${p}-meta-item"><strong>When</strong><span>${dayName} ${timeRange}</span></div>
-            <div class="${p}-meta-item"><strong>Where</strong><span>${firstSlot.studio ? 'Studio ' + firstSlot.studio : '?'}</span></div>
+            <div class="${p}-meta-item"><strong>Where</strong><span>${firstSlot.studio ? 'Studio ' + String(firstSlot.studio).replace(/^Studio\s+/i, '') : '?'}</span></div>
             <div class="${p}-meta-item"><strong>Teacher</strong><span>${_allSameTeacher
               ? (firstSlot.teacher || '?') + (firstSlot.coTeachers ? ' & ' + firstSlot.coTeachers : '')
               : dayLevels.map(e => `${e.lv.level}: ${e.slot.teacher || '?'}`).join('<br>')
@@ -3002,17 +3039,49 @@ function wsLevelsHtml(style, descsByLevel, wsData) {
   };
   const semesterTagDays = allDays.map(d => wsShortDay(d) + ' ' + (_slotsByDay[d] ? _timeLabel(_slotsByDay[d]) : 'evenings')).join(' + ');
 
-  // Count how many cards will actually render — per-level: one per level; day-based: one per unique day
+  // Drop-in styles (Pilates / Dance & Fit / Wed Yoga) render one card per day-slot.
+  const _dropinDays = (wsData && Array.isArray(wsData.dropinDays)) ? wsData.dropinDays : null;
+  const _totalSlots = levels.reduce((n, lv) => n + ((lv.slots || []).length), 0);
+  // Count how many cards will actually render — per-level: one per level (or one per
+  // day-slot for drop-in styles); day-based: one per unique day.
   const renderedCardCount = layout === 'day'
     ? dayOrder.filter(d => allDays.includes(d)).length
-    : levels.length;
+    : (_dropinDays ? _totalSlots : levels.length);
   const isSingleCard = renderedCardCount === 1;
   const gridCols = isSingleCard ? '1fr' : '1fr 1fr';
   const gridExtra = isSingleCard ? 'max-width:640px;margin:0 auto;' : '';
 
   // Generate cards
   let cardsHtml = '';
-  if (layout === 'per-level') {
+  let dropinBelowHtml = '';   // shared drop-in section rendered below the cards (multi-day drop-in styles)
+  if (layout === 'per-level' && _dropinDays) {
+    // Drop-in styles: one card per day-slot.
+    // • Single drop-in day (e.g. Wed Yoga): drop-in block under that day's card,
+    //   "Semester registration only" note on the others.
+    // • Multiple drop-in days (e.g. Pilates Tue+Wed): ONE shared drop-in section
+    //   below both cards — the pack covers any day, so don't repeat it per card.
+    const _tod = s => { const h = parseInt((s.start || '0').split(':')[0]); return h < 12 ? 'morning' : h < 17 ? 'afternoon' : 'evening'; };
+    const _multiDropin = _dropinDays.length > 1;
+    const cards = [];
+    levels.forEach((lv, i) => {
+      const levelDesc = _descs[lv.level] || _descs['Level ' + (i + 1)] || '';
+      (lv.slots || []).forEach(s => {
+        const isDropin = _dropinDays.includes(s.day);
+        cards.push(wsPerLevelCard(lv, i, meta, p, false, levelDesc, {
+          slotOverride: s,
+          title: (s.day || '') + ' ' + _tod(s),
+          dropinHtml: (!_multiDropin && isDropin) ? wsDropinSectionHtml(p) : '',
+          semesterOnly: (!_multiDropin && !isDropin)
+        }));
+      });
+    });
+    cardsHtml = cards.join('\n');
+    if (_multiDropin) {
+      const _note = 'Prefer flexibility? Come to any ' + _dropinDays.join(' or ') +
+        ' session — pick 3 or 5 dates, no semester commitment needed.';
+      dropinBelowHtml = '\n  <div style="max-width:640px;margin:1.5rem auto 0;">' + wsDropinSectionHtml(p, _note) + '</div>';
+    }
+  } else if (layout === 'per-level') {
     cardsHtml = levels.map((lv, i) => {
       const isStarter = /starter/i.test(lv.level || '');
       const levelDesc = _descs[lv.level] || _descs['Level ' + (i + 1)] || '';
@@ -3093,6 +3162,21 @@ function wsLevelsHtml(style, descsByLevel, wsData) {
 .${p}-reg .spring-note{display:flex;align-items:center;gap:.5rem;font-size:.8rem;color:#5a3a7a;background:#f5ecff;border:1px solid #e0ccf8;border-radius:6px;padding:.55rem .9rem;margin-top:1.25rem;}
 .${p}-reg .spring-note a{color:#B564F7;text-decoration:none;font-weight:700;}
 .${p}-reg .spring-note a:hover{text-decoration:underline;}
+.${p}-reg .${p}-semester-only-note{font-size:.75rem;color:#6b6b6b;text-align:center;padding:.35rem 0 0;margin:0;}
+.${p}-reg .${p}-dropin-section{border-top:1.5px dashed #d4bef7;padding-top:1rem;margin-top:.25rem;display:flex;flex-direction:column;gap:.75rem;}
+.${p}-reg .${p}-dropin-label{font-size:.68rem;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:#B564F7;margin:0 0 .35rem;}
+.${p}-reg .${p}-dropin-note{font-size:.78rem;color:#6b6b6b;margin:0;line-height:1.5;}
+.${p}-reg .${p}-dropin-packs{display:flex;gap:.65rem;}
+.${p}-reg .${p}-dropin-pack{flex:1;border:1.5px solid #d4bef7;border-radius:8px;padding:.7rem .75rem;text-align:center;background:#faf4ff;}
+.${p}-reg .${p}-dropin-sessions{font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#B564F7;margin-bottom:.2rem;}
+.${p}-reg .${p}-dropin-price{font-family:'Marcellus',serif;font-size:1.2rem;color:#1a1a1a;}
+.${p}-reg a.dropin-register,
+.${p}-reg a.dropin-register:link,
+.${p}-reg a.dropin-register:visited,
+.${p}-reg a.dropin-register:hover,
+.${p}-reg a.dropin-register:focus,
+.${p}-reg a.dropin-register:active{display:block!important;text-align:center!important;background:transparent!important;background-color:transparent!important;background-image:none!important;color:#B564F7!important;font-family:'PT Serif',Georgia,serif!important;font-size:.85rem!important;font-weight:700!important;letter-spacing:.04em!important;text-decoration:none!important;border:1.5px solid #B564F7!important;border-radius:7px!important;padding:.6rem 1rem!important;box-shadow:none!important;outline:none!important;pointer-events:auto!important;cursor:pointer!important;}
+.${p}-reg a.dropin-register:hover{background:#B564F7!important;background-color:#B564F7!important;color:#fff!important;}
 .${p}-reg .${p}-partner-callout{display:flex;gap:.6rem;align-items:flex-start;background:#F5ECFF;border:1.5px solid #dbc5f8;border-radius:8px;padding:.7rem 1rem;margin-bottom:1.25rem;font-size:.83rem;color:#3a1a5c;line-height:1.55;}
 .${p}-reg .${p}-partner-callout strong{font-weight:700;}
 .${p}-reg .${p}-partner-callout a{color:#B564F7;text-decoration:none;}
@@ -3115,7 +3199,7 @@ function wsLevelsHtml(style, descsByLevel, wsData) {
     <span><strong>Partner required</strong> — please register together with your dance partner.${wsData.partnerForumUrl ? ` Looking for one? <a href="${wsData.partnerForumUrl}">Join the Shoonya Dance Forum →</a>` : ''}</span>
   </div>` : ''}
   <div class="level-cards">
-${cardsHtml}  </div>
+${cardsHtml}  </div>${dropinBelowHtml}
   ${WS_SPRING_NOTE ? `<p class="spring-note"><span aria-hidden="true">🌸</span><span>${WS_SPRING_NOTE} — <a href="${WS_SPRING_SCHEDULE_URL}">view the spring schedule →</a></span></p>` : ''}
   ${isSingleCard ? `</div>` : ''}
 </div>`;
@@ -3192,11 +3276,20 @@ function renderWebsiteSection(style) {
   const dayOrder = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
   allDays.sort((a, b) => dayOrder.indexOf(a) - dayOrder.indexOf(b));
   const studios  = [...new Set(allSlots.map(s => s.studio).filter(Boolean))];
-  const factsLine = [
+  const factsParts = [
     allDays.join(' + ').toUpperCase(),
     studios.join(' + ').toUpperCase() || '?',
     (displayTeacher || teacherName || '?').toUpperCase()
-  ].filter(Boolean).join(' · ');
+  ];
+  // Drop-in styles flag it in the facts line — day-aware: "(WED)" only when not
+  // every day of the style is drop-in (e.g. Yoga is Tue-semester + Wed-dropin).
+  const _heroDropinDays = (wsData.dropinDays || []);
+  if (_heroDropinDays.length) {
+    const _allDropin = allDays.length && allDays.every(d => _heroDropinDays.includes(d));
+    factsParts.push(_allDropin ? 'DROP-IN PACKS'
+      : 'DROP-IN PACKS (' + _heroDropinDays.map(d => wsShortDay(d).toUpperCase()).join('/') + ')');
+  }
+  const factsLine = factsParts.filter(Boolean).join(' · ');
   const hookLine = wsData.hook || '[One-sentence hook — what makes this style worth trying?]';
   const heroNative = `${style.name}\n\n${factsLine}\n\n${hookLine}\n\n[Button] REGISTER FOR SEP 2026 ↓ → #register`;
 
