@@ -1,16 +1,5 @@
 // ws-embed.js — Shoonya style page embed
 // Served from: https://classes.shoonyadance.com/ws-embed.js
-// v6 · 2026-06-19 — inject Course/CourseInstance JSON-LD per style page from the
-//                   feed (style/level/day/time/dates/teacher/studio), so weekly
-//                   classes are machine-readable for search + answer engines.
-//                   No price/Offer yet (prices are computed tiers — add later).
-// v5.1 · 2026-06-19 — match buttons to cards by day + START TIME (was day-only,
-//                   which piled both same-day levels onto one per-level card).
-//                   Time parsing accepts ":" / "." / "u"/"h" (NL Weglot renders
-//                   "18.30 uur"). Card-title level number as fallback if no time.
-// v5 · 2026-06-19 — add inline "Add your classes to your calendar" buttons after
-//                   the date list: one direct .ics download per class/level, built
-//                   from the live publicSchedule feed (holiday + teacher-break aware).
 // v4 · 2026-06-10 — auto-hide stale "Spring 2026 classes still running" notes
 //                   baked into older Level/Pricing blocks, from 14 Jun onward
 // v3 · 2026-06-09 — drop-in packs moved to the Block Studio levels block (not the
@@ -57,80 +46,6 @@
     'Bachata Solo Style':      '/bachata-solo-style-gent',
     'Oriental Flow':           '/oriental-flow-gent'
   };
-
-  // ── Add-to-calendar (inline .ics download) ────────────────────────────────
-  // Style pages list session dates as plain display text (no machine dates), so
-  // we pull the real per-class dates from the same publicSchedule feed the
-  // schedule page uses (holiday- AND teacher-break-aware), and build the .ics
-  // in-browser. One file → all pages; downloads right on the style page, no jump.
-  var SCHED_FEED = 'https://script.google.com/macros/s/AKfycbwh9PSrNxMUkBaMayhyfnU3XDzL76khEm7RL932CJ83qqm7dTG9afA-WB1cZYKSrcs3/exec';
-  var SCHED_SEMESTER = 'Semester 1 — 2026/2027';
-  var _feedPromise = null;
-
-  function styleForPath(path) {
-    for (var name in SLUGS) { if (SLUGS[name] === path) return name; }
-    return null;
-  }
-
-  function fetchSchedule() {
-    if (_feedPromise) return _feedPromise;
-    _feedPromise = fetch(SCHED_FEED + '?action=publicSchedule&semester=' + encodeURIComponent(SCHED_SEMESTER))
-      .then(function (r) { return r.ok ? r.json() : null; })
-      .then(function (j) { return (j && j.ok && Array.isArray(j.slots)) ? j.slots : null; })
-      .catch(function () { return null; }); // offline / CORS → no button, no breakage
-    return _feedPromise;
-  }
-
-  // Accept ":" (feed/EN), "." and "u"/"h" (NL/Weglot renders "18.30 uur" / "18u30").
-  function hhmm(s) { var m = String(s).match(/(\d{1,2})[:.uh](\d{2})/i); return m ? (('0' + m[1]).slice(-2) + ':' + m[2]) : ''; }
-
-  // Empty slotDates in the feed = full-term class → compute the STANDARD calendar
-  // (school holidays only), exactly as the schedule page does. NOT "no dates".
-  var TERM = { start: '2026-09-14', end: '2027-01-30' };
-  var HOLIDAYS = [{ start: '2026-11-01', end: '2026-11-08' }, { start: '2026-12-20', end: '2027-01-10' }];
-  var DAY_IDX = { sun: 0, mon: 1, tue: 2, wed: 3, thu: 4, fri: 5, sat: 6 };
-  function computeStdDates(dayCode) {
-    var tgt = DAY_IDX[dayCode]; if (tgt == null) return [];
-    var end = new Date(TERM.end + 'T12:00:00');
-    var hol = HOLIDAYS.map(function (h) { return [new Date(h.start + 'T00:00:00').getTime(), new Date(h.end + 'T23:59:59').getTime()]; });
-    var d = new Date(TERM.start + 'T12:00:00');
-    while (d.getDay() !== tgt) d.setDate(d.getDate() + 1);
-    var out = [];
-    while (d.getTime() <= end.getTime()) {
-      var iso = d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
-      var t = d.getTime();
-      if (!hol.some(function (h) { return t >= h[0] && t <= h[1]; })) out.push(iso);
-      d.setDate(d.getDate() + 7);
-    }
-    return out;
-  }
-  function sessionDates(slot) { return (slot.slotDates && slot.slotDates.length) ? slot.slotDates : computeStdDates(slot.day); }
-
-  // Build a multi-VEVENT .ics (one event per session — same logic as the schedule
-  // page; DTSTART+RDATE silently drops dates in Apple/Google one-shot import).
-  function buildICS(slot) {
-    var dates = sessionDates(slot);
-    var start = hhmm(slot.start), end = hhmm(slot.end);
-    if (!dates.length || !start || !end) return null;
-    var dt = function (d, t) { return d.replace(/-/g, '') + 'T' + t.replace(':', '') + '00'; };
-    var e2 = function (v) { return String(v).replace(/([,;\\])/g, '\\$1').replace(/\n/g, '\\n'); };
-    var slug = (slot.style + '-' + slot.day + '-' + (slot.studio || '') + '-' + start).toLowerCase().replace(/[^a-z0-9]+/g, '-');
-    var summary = e2(slot.style + ' · Shoonya');
-    var loc = e2((slot.studioName || slot.studio || '') + ' · Shoonya Dance Centre, Stapelplein 41, 9000 Gent');
-    var desc = e2((slot.level || '') + (slot.teacher ? ' · with ' + slot.teacher : '') + '. Class times only.');
-    var L = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Shoonya Dance Centre//Styles//EN', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH',
-      'BEGIN:VTIMEZONE', 'TZID:Europe/Brussels',
-      'BEGIN:DAYLIGHT', 'TZOFFSETFROM:+0100', 'TZOFFSETTO:+0200', 'TZNAME:CEST', 'DTSTART:19700329T020000', 'RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU', 'END:DAYLIGHT',
-      'BEGIN:STANDARD', 'TZOFFSETFROM:+0200', 'TZOFFSETTO:+0100', 'TZNAME:CET', 'DTSTART:19701025T030000', 'RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU', 'END:STANDARD',
-      'END:VTIMEZONE'];
-    dates.forEach(function (d) {
-      L.push('BEGIN:VEVENT', 'UID:' + slug + '-' + d.replace(/-/g, '') + '@styles.shoonyadance.com',
-        'DTSTART;TZID=Europe/Brussels:' + dt(d, start), 'DTEND;TZID=Europe/Brussels:' + dt(d, end),
-        'SUMMARY:' + summary, 'LOCATION:' + loc, 'DESCRIPTION:' + desc, 'END:VEVENT');
-    });
-    L.push('END:VCALENDAR');
-    return L.join('\r\n');
-  }
 
   // ── Drop-in packs ─────────────────────────────────────────────────────────
   // The casual-attendance classes (Pilates, Dance & Fit, Wednesday Yoga) offer
@@ -353,12 +268,7 @@
     '.wsep-prac .wsep-dropin-sessions{font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#B564F7;margin-bottom:.2rem;}',
     '.wsep-prac .wsep-dropin-price{font-family:\'Marcellus\',serif;font-size:1.2rem;color:#1a1a1a;}',
     '.wsep-prac a.wsep-dropin-btn,.wsep-prac a.wsep-dropin-btn:link,.wsep-prac a.wsep-dropin-btn:visited,.wsep-prac a.wsep-dropin-btn:hover,.wsep-prac a.wsep-dropin-btn:focus,.wsep-prac a.wsep-dropin-btn:active{display:block;text-align:center;background:transparent!important;color:#B564F7!important;font-family:\'PT Serif\',Georgia,serif!important;font-size:.85rem;font-weight:700;letter-spacing:.04em;text-decoration:none!important;border:1.5px solid #B564F7!important;border-radius:7px;padding:.6rem 1rem;pointer-events:auto!important;cursor:pointer!important;box-shadow:none!important;outline:none!important;}',
-    '.wsep-prac a.wsep-dropin-btn:hover{background:#B564F7!important;color:#fff!important;}',
-    // Add-to-calendar buttons — sit outside .wsep-prac (next to the date list), so unscoped.
-    '.wsep-cal-group{margin:.75rem 0 1.25rem;}',
-    '.wsep-cal-head{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#7E4FBF;margin:0 0 .5rem;}',
-    'a.wsep-cal-link,a.wsep-cal-link:link,a.wsep-cal-link:visited,a.wsep-cal-link:hover,a.wsep-cal-link:focus,a.wsep-cal-link:active{display:inline-block;margin:0 .5rem .5rem 0;font-family:\'PT Serif\',Georgia,serif!important;font-size:.82rem;font-weight:700;letter-spacing:.02em;color:#B564F7!important;background:transparent!important;text-decoration:none!important;border:1.5px solid #B564F7!important;border-radius:7px;padding:.5rem .9rem;pointer-events:auto!important;cursor:pointer!important;box-shadow:none!important;outline:none!important;}',
-    'a.wsep-cal-link:hover{background:#B564F7!important;color:#fff!important;}'
+    '.wsep-prac a.wsep-dropin-btn:hover{background:#B564F7!important;color:#fff!important;}'
   ].join('\n');
 
   // ── Helpers ───────────────────────────────────────────────────────────────
@@ -504,208 +414,6 @@
     } catch (e) {}
   }
 
-  // ── Add-to-calendar buttons ───────────────────────────────────────────────
-  // Adds direct-download .ics buttons under each date-list block. The style
-  // pages already group classes by day (Mon/Wed/Thu cards, one date list each),
-  // so we attach THAT day's level buttons to THAT day's card — keeping the page's
-  // existing day grouping intact. Purely additive: only READS the page (anchor,
-  // language, day) and INSERTS its own blocks; never edits or removes content.
-  // Idempotent (_calDone flag). Runs on delayed passes (date blocks load async).
-  var DAY_ORDER = { mon: 1, tue: 2, wed: 3, thu: 4, fri: 5, sat: 6, sun: 7 };
-  var _calDone = false;
-
-  // Day code from a token like "ma", "Mon", "vrijdag", "Thursday" (NL + EN).
-  function dayCode(tok) {
-    tok = String(tok).toLowerCase().replace(/[^a-z]/g, '');
-    if (tok === 'ma' || tok === 'mon' || tok.indexOf('maan') === 0 || tok.indexOf('mon') === 0) return 'mon';
-    if (tok === 'di' || tok.indexOf('dins') === 0 || tok.indexOf('tue') === 0) return 'tue';
-    if (tok === 'wo' || tok.indexOf('woen') === 0 || tok.indexOf('wed') === 0) return 'wed';
-    if (tok === 'do' || tok.indexOf('dond') === 0 || tok.indexOf('thu') === 0) return 'thu';
-    if (tok === 'vr' || tok.indexOf('vrij') === 0 || tok.indexOf('fri') === 0) return 'fri';
-    if (tok === 'za' || tok.indexOf('zat') === 0 || tok.indexOf('sat') === 0) return 'sat';
-    if (tok === 'zo' || tok.indexOf('zon') === 0 || tok.indexOf('sun') === 0) return 'sun';
-    return null;
-  }
-
-  // Which day does this date-list block belong to? Read its first listed date.
-  function blockDay(details) {
-    try {
-      var span = details.querySelector('[class*="date-grid"] span') || (details.querySelector('div') && details.querySelector('div').querySelector('span'));
-      if (!span) return null;
-      return dayCode(span.textContent.trim().split(/\s+/)[0]);
-    } catch (e) { return null; }
-  }
-
-  // The class START times shown in this block's card. Generator layouts differ:
-  // a 'per-level' card shows ONE class time → matches one class; a 'day' card shows
-  // several level rows → matches several. We take the START of each "HH:MM–HH:MM"
-  // range (group 1 only, so a class's END time never collides with the next's START).
-  function cardStarts(details) {
-    var card = details.closest('[class*="level-card"]') || details.closest('[class*="card"]') || details.parentElement;
-    var set = {};
-    var txt = card ? card.textContent : '';
-    // Time separators: ":" (EN/feed), "." and "u"/"h" (NL/Weglot). Requires a range
-    // (two times + dash) so prices like "€34.6" never register as a time.
-    var re = /(\d{1,2}[:.uh]\d{2})\s*[–\-—]\s*\d{1,2}[:.uh]\d{2}/gi, m;
-    while ((m = re.exec(txt))) { var t = hhmm(m[1]); if (t) set[t] = 1; }
-    return set;
-  }
-
-  // Level number from the card's TITLE only (e.g. "Niveau 2" / "Level 2") — not the
-  // whole card, because descriptions reference other levels ("…eerst niveau 2…").
-  // Fallback signal for per-level cards if the time format ever fails to parse.
-  function cardLevel(details) {
-    var card = details.closest('[class*="level-card"]') || details.closest('[class*="card"]') || details.parentElement;
-    var t = card && (card.querySelector('[class*="level-title"]') || card.querySelector('h1,h2,h3,h4'));
-    var txt = t ? t.textContent.toLowerCase() : '';
-    var m = txt.match(/(?:niveau|level)\s*(\d)/) || txt.match(/\bl(\d)\b/);
-    return m ? m[1] : null;
-  }
-
-  function calButton(slot, nl) {
-    var ics = buildICS(slot); if (!ics) return null;
-    var lvl = (slot.level || '').trim(); if (nl) lvl = lvl.replace(/Level/i, 'Niveau');
-    var dayShort = (nl
-      ? { mon: 'ma', tue: 'di', wed: 'wo', thu: 'do', fri: 'vr', sat: 'za', sun: 'zo' }
-      : { mon: 'Mon', tue: 'Tue', wed: 'Wed', thu: 'Thu', fri: 'Fri', sat: 'Sat', sun: 'Sun' })[slot.day] || slot.day;
-    var a = document.createElement('a');
-    a.className = 'wsep-cal-link';
-    a.href = URL.createObjectURL(new Blob([ics], { type: 'text/calendar;charset=utf-8' }));
-    a.download = (slot.style + '-' + (slot.level || '') + '-' + slot.day + '-shoonya').toLowerCase().replace(/[^a-z0-9]+/g, '-') + '.ics';
-    a.textContent = '📅 ' + (lvl ? lvl + ' · ' : '') + dayShort + ' ' + hhmm(slot.start) + (nl ? ' — agenda' : ' — calendar');
-    return a;
-  }
-
-  function injectCalendarButtons() {
-    try {
-      if (_calDone) return;
-      var path = (window.location.pathname || '').replace(/\/$/, '').toLowerCase();
-      var styleName = styleForPath(path);
-      if (!styleName) return;
-      if (!document.querySelector('details[class*="-date-list"]')) return; // not in DOM yet
-      fetchSchedule().then(function (slots) {
-        if (_calDone || !slots) return;
-        var anchors = [].slice.call(document.querySelectorAll('details[class*="-date-list"]'));
-        if (!anchors.length) return;
-        var mine = slots.filter(function (s) { return (s.style || '').toLowerCase() === styleName.toLowerCase(); });
-        if (!mine.length) return;
-        mine.sort(function (a, b) { return (DAY_ORDER[a.day] || 9) - (DAY_ORDER[b.day] || 9) || hhmm(a.start).localeCompare(hhmm(b.start)); });
-        injectStyles();
-        _calDone = true;
-        var rendered = {};
-        var key = function (s) { return s.day + '|' + hhmm(s.start); };
-        function makeGroup(list, nl) {
-          var g = document.createElement('div'); g.className = 'wsep-cal-group';
-          var h = document.createElement('div'); h.className = 'wsep-cal-head';
-          h.textContent = nl ? 'Zet je lessen in je agenda' : 'Add your classes to your calendar';
-          g.appendChild(h);
-          list.forEach(function (s) { var b = calButton(s, nl); if (b) { g.appendChild(b); rendered[key(s)] = 1; } });
-          return g;
-        }
-        // Attach buttons to each date-list block. Match the block's classes by:
-        //  1) day (from the block's first date) + class START time shown in its card
-        //     → handles per-level cards (one time) and day cards (several rows).
-        //  2) if no time parses, fall back to the card's TITLE level number + day.
-        // If neither signal is present, render nothing for that block (safe — never
-        // dump all-day buttons onto one card, which mis-assigned same-day levels).
-        anchors.forEach(function (a) {
-          var sum = a.querySelector('summary');
-          var nl = /bekijk|sessies/.test((sum ? sum.textContent : '').toLowerCase());
-          var day = blockDay(a);
-          var starts = cardStarts(a);
-          var hasStarts = Object.keys(starts).length > 0;
-          var lvl = hasStarts ? null : cardLevel(a);
-          var list = mine.filter(function (s) {
-            if (rendered[key(s)]) return false;
-            if (day && s.day !== day) return false;
-            if (hasStarts) return !!starts[hhmm(s.start)];
-            if (lvl) { var n = (String(s.level).match(/\d/) || [])[0]; return n === lvl; }
-            return false;
-          });
-          if (!list.length) return;
-          var g = makeGroup(list, nl);
-          if (g.children.length > 1 && a.parentNode) a.parentNode.insertBefore(g, a.nextSibling);
-        });
-      });
-    } catch (e) {}
-  }
-
-  // ── Course / CourseInstance schema (F-07) ─────────────────────────────────
-  // Inject Course + CourseInstance JSON-LD built from the same feed, so weekly
-  // classes are machine-readable for search + answer engines (style/level/day/
-  // time/dates/teacher/studio). No price/Offer yet — prices are computed tiers;
-  // add later from a sync-safe source. One graph per style page, injected once.
-  var _courseDone = false;
-  var COURSE_DAYNAME = { mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday', thu: 'Thursday', fri: 'Friday', sat: 'Saturday', sun: 'Sunday' };
-  function toMin(t) { var m = String(t).match(/(\d{1,2}):(\d{2})/); return m ? (+m[1] * 60 + +m[2]) : 0; }
-
-  function injectCourseSchema() {
-    try {
-      if (_courseDone || document.getElementById('wsep-course-jsonld')) return;
-      var path = (window.location.pathname || '').replace(/\/$/, '').toLowerCase();
-      var styleName = styleForPath(path);
-      if (!styleName) return;
-      fetchSchedule().then(function (slots) {
-        if (_courseDone || document.getElementById('wsep-course-jsonld') || !slots) return;
-        var mine = slots.filter(function (s) { return (s.style || '').toLowerCase() === styleName.toLowerCase(); });
-        if (!mine.length) return;
-        mine.sort(function (a, b) { return (DAY_ORDER[a.day] || 9) - (DAY_ORDER[b.day] || 9) || hhmm(a.start).localeCompare(hhmm(b.start)); });
-        var base = (location.origin + location.pathname).replace(/\/$/, '');
-        var levels = [], days = [];
-        mine.forEach(function (s) {
-          var lv = (s.level || '').trim(); if (lv && levels.indexOf(lv) < 0) levels.push(lv);
-          var d = COURSE_DAYNAME[s.day]; if (d && days.indexOf(d) < 0) days.push(d);
-        });
-        var instances = mine.map(function (s) {
-          var dates = sessionDates(s); if (!dates.length) return null;
-          var start = hhmm(s.start), end = hhmm(s.end), dur = toMin(end) - toMin(start);
-          var teacher = (s.teacher || '').split('(')[0].trim();
-          var ci = {
-            '@type': 'CourseInstance',
-            '@id': base + '/#instance-' + s.day + '-' + start.replace(':', ''),
-            name: s.style + (s.level ? (' — ' + s.level) : ''),
-            courseMode: 'onsite',
-            startDate: dates[0],
-            endDate: dates[dates.length - 1],
-            location: {
-              '@type': 'Place',
-              name: (s.studioName || s.studio || 'Shoonya Dance Centre') + ' · Shoonya Dance Centre',
-              address: { '@type': 'PostalAddress', streetAddress: 'Stapelplein 41', postalCode: '9000', addressLocality: 'Gent', addressCountry: 'BE' }
-            }
-          };
-          if (dur > 0) ci.courseWorkload = 'PT' + dur + 'M';
-          if (teacher) ci.instructor = { '@type': 'Person', name: teacher };
-          return ci;
-        }).filter(Boolean);
-        if (!instances.length) return;
-        _courseDone = true;
-        var descr = 'Weekly ' + styleName + ' classes for adults in Ghent at Shoonya Dance Centre'
-          + (levels.length ? (' — levels: ' + levels.join(', ')) : '')
-          + (days.length ? (' · ' + days.join(', ')) : '') + '. Sep 2026 to Jan 2027.';
-        var graph = {
-          '@context': 'https://schema.org',
-          '@graph': [
-            { '@type': 'Organization', '@id': 'https://www.shoonyadance.com/#organization', name: 'Shoonya Dance Centre', url: 'https://www.shoonyadance.com/' },
-            {
-              '@type': 'Course',
-              '@id': base + '/#course',
-              name: styleName + ' classes in Ghent',
-              description: descr,
-              provider: { '@id': 'https://www.shoonyadance.com/#organization' },
-              inLanguage: 'en',
-              hasCourseInstance: instances
-            }
-          ]
-        };
-        var sc = document.createElement('script');
-        sc.type = 'application/ld+json';
-        sc.id = 'wsep-course-jsonld';
-        sc.textContent = JSON.stringify(graph);
-        document.head.appendChild(sc);
-      });
-    } catch (e) {}
-  }
-
   // ── Entry point ───────────────────────────────────────────────────────────
   // Squarespace injects code blocks asynchronously, so #ws-prac-root may not
   // exist when DOMContentLoaded fires. Poll until it appears (max 3 seconds).
@@ -727,14 +435,9 @@
     // Hide expired seasonal notes now and on a few delayed passes (the static
     // spring-note block is a separate Squarespace code block, injected async).
     hideExpiredSpringNotes();
-    injectCalendarButtons();
-    injectCourseSchema();
     setTimeout(hideExpiredSpringNotes, 500);
     setTimeout(hideExpiredSpringNotes, 1500);
     setTimeout(hideExpiredSpringNotes, 3000);
-    setTimeout(injectCalendarButtons, 600);
-    setTimeout(injectCalendarButtons, 1600);
-    setTimeout(injectCalendarButtons, 3200);
     // If the div wasn't in the DOM yet, poll every 100ms for up to 3 seconds
     if (!document.getElementById('ws-prac-root')) {
       var attempts = 0;
