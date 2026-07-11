@@ -414,6 +414,28 @@
     } catch (e) {}
   }
 
+  // ── Hero CTA safety repair ───────────────────────────────────────────────
+  // Native Squarespace hero buttons are edited by hand. If a copied page keeps
+  // another style's URL on the "REGISTER FOR SEP 2026" button, repair it to the
+  // local registration section instead of sending visitors to the wrong class.
+  function repairHeroRegisterLinks() {
+    try {
+      var path = (window.location.pathname || '').replace(/\/$/, '').toLowerCase();
+      if (!PAGES[path]) return;
+      var links = document.querySelectorAll('a[href]');
+      for (var i = 0; i < links.length; i++) {
+        var link = links[i];
+        var text = (link.textContent || '').replace(/\s+/g, ' ').trim().toUpperCase();
+        if (text.indexOf('REGISTER FOR SEP 2026') < 0) continue;
+        var href = link.getAttribute('href') || '';
+        if (href === '#register') continue;
+        link.setAttribute('href', '#register');
+        link.removeAttribute('target');
+        link.removeAttribute('rel');
+      }
+    } catch (e) {}
+  }
+
   // ── Entry point ───────────────────────────────────────────────────────────
   // Squarespace injects code blocks asynchronously, so #ws-prac-root may not
   // exist when DOMContentLoaded fires. Poll until it appears (max 3 seconds).
@@ -432,9 +454,13 @@
 
   function init() {
     render();
+    repairHeroRegisterLinks();
     // Hide expired seasonal notes now and on a few delayed passes (the static
     // spring-note block is a separate Squarespace code block, injected async).
     hideExpiredSpringNotes();
+    setTimeout(repairHeroRegisterLinks, 500);
+    setTimeout(repairHeroRegisterLinks, 1500);
+    setTimeout(repairHeroRegisterLinks, 3000);
     setTimeout(hideExpiredSpringNotes, 500);
     setTimeout(hideExpiredSpringNotes, 1500);
     setTimeout(hideExpiredSpringNotes, 3000);
