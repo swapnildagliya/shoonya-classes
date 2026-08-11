@@ -3317,10 +3317,10 @@ function renderWebsiteSection(style) {
   const socialLinksHtml = wsSocialLinksHtml(wsData.social || []);
 
   // Section label blocks — About/Teacher/Coming Up labels removed (blocks self-label)
-  // Pass-priced styles (Tono's Int/Adv mornings) sit outside the semester term,
-  // so the free trial week does not apply to them. Emitting the pill invited a
-  // paste that would have been wrong on the page — Swapnil, 2026-08-11.
-  const trialPillHtml    = wsData.passPricing ? '' : wsTrialPillHtml();
+  // NOTE: do NOT gate this on passPricing. A class pass does not exclude a trial
+  // week — that was a wrong inference (Swapnil, 2026-08-11). Whether to advertise
+  // a trial is an operational call per class, not a property of the pricing model.
+  const trialPillHtml    = wsTrialPillHtml();
   const levelsHtml       = wsLevelsHtml(style, wsData.descriptionsByLevel || null, wsData);
   const practicalHtml    = wsPracticalHtml(style, prefix, wsData);
 
