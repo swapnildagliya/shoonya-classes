@@ -219,6 +219,11 @@
       wear:  'Comfortable dancewear you can move freely in. Barefoot or soft dance shoes.',
       bring: 'Water bottle. Hip scarf optional.',
       also:  [['Raqs Sharqi','Monday · Open'],['Kizomba','Wednesday · Open'],['Burlesque','Thursday · L1/L2']]
+    },
+    '/contemporary-dance-gent': {
+      wear:  'Whatever you feel comfortable moving in — this is a space to just be yourself. Socks or bare feet; whatever you are used to. No street shoes in the studio.',
+      bring: 'Water bottle. Small hand towel for sweat.',
+      also:  [['Ballet','Mon & Thu mornings · Int/Adv'],['Pilates for Dancers','Tue & Wed · Open'],['Yoga','Tue & Wed · Open']]
     }
   };
 
