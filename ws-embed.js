@@ -228,7 +228,7 @@
   // dropinPacks = { note, packs, url } — renders the drop-in pack section.
   var PAGES = {
     '/argentijnse-tango-danslessen-gent': {
-      wear:  'Comfortable, form-fitting dancewear. Smooth-soled indoor shoes that allow you to pivot easily — thick socks work fine for beginners. Change into dance shoes outside the studio.',
+      wear:  'Comfortable, form-fitting dancewear. Smooth-soled dance shoes that allow you to pivot easily — thick socks work fine for beginners.',
       bring: 'Water bottle. Dance shoes (or thick socks to start).',
       partner: { required: true },
       also:  [['Bachata','Tuesday · L1/L2/L3'],['Cuban Salsa','Monday · L1/L2/L3/L4'],['Flamenco','Tuesday · L1/L2/L3']]
