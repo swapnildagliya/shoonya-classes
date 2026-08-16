@@ -78,6 +78,11 @@
     return null;
   }
 
+  function stylePagePath() {
+    var path = (window.location.pathname || '').replace(/\/$/, '').toLowerCase();
+    return path.replace(/^\/nl(?=\/)/, '');
+  }
+
   // Style names in the feed do not always match the SLUGS keys exactly. The sheet carries
   // "Raqs Sharqi (bellydance)" while SLUGS says "Raqs Sharqi", and an exact lowercase compare
   // silently produced NO add-to-calendar buttons on that page — for months, invisibly, because
@@ -581,12 +586,25 @@
   // 14 Jun onward. Runs on a few delayed passes because Squarespace injects code
   // blocks asynchronously. Safe no-op before the cutoff and on pages with no
   // stale spring note.
+  //
+  // 2026-08-16: the match was previously the single phrase /spring 2026 classes
+  // still running/i, which matched only ONE of the three wordings actually pasted
+  // into Squarespace. The other two say "Spring 2026 classes run until 9 June",
+  // so they slipped through and were still visible to the public in mid-August —
+  // verified live on /kathak-danslessen-in-gent. Matching on /spring 2026/i
+  // instead catches every wording, including any future one, which is the whole
+  // point of a safety net. The date guard already scopes this to "after spring
+  // ended", so hiding ANY spring-2026 note past that date is exactly the intent.
+  //
+  // This is a NET, not the fix. The real fix is deleting the paragraphs from the
+  // Squarespace page bodies — the copy is false ("classes run until 9 June" in
+  // August), not merely mislinked. Do not treat this as closing that task.
   function hideExpiredSpringNotes() {
     try {
       if (new Date() < new Date('2026-06-14T00:00:00')) return;
       var notes = document.querySelectorAll('.spring-note');
       for (var i = 0; i < notes.length; i++) {
-        if (/spring 2026 classes still running/i.test(notes[i].textContent || '')) {
+        if (/spring\s*2026/i.test(notes[i].textContent || '')) {
           notes[i].style.display = 'none';
         }
       }
@@ -599,7 +617,7 @@
   // local registration section instead of sending visitors to the wrong class.
   function repairHeroRegisterLinks() {
     try {
-      var path = (window.location.pathname || '').replace(/\/$/, '').toLowerCase();
+      var path = stylePagePath();
       if (!PAGES[path]) return;
       var links = document.querySelectorAll('a[href]');
       for (var i = 0; i < links.length; i++) {
@@ -690,7 +708,7 @@
   function injectCalendarButtons() {
     try {
       if (_calDone) return;
-      var path = (window.location.pathname || '').replace(/\/$/, '').toLowerCase();
+      var path = stylePagePath();
       var styleName = styleForPath(path);
       if (!styleName) return;
       if (!document.querySelector('details[class*="date-list"]')) return; // not in DOM yet
@@ -753,7 +771,7 @@
   function injectCourseSchema() {
     try {
       if (_courseDone || document.getElementById('wsep-course-jsonld')) return;
-      var path = (window.location.pathname || '').replace(/\/$/, '').toLowerCase();
+      var path = stylePagePath();
       var styleName = styleForPath(path);
       if (!styleName) return;
       fetchSchedule().then(function (slots) {
@@ -822,7 +840,7 @@
   // exist when DOMContentLoaded fires. Poll until it appears (max 3 seconds).
 
   function render() {
-    var path = (window.location.pathname || '').replace(/\/$/, '').toLowerCase();
+    var path = stylePagePath();
     var data = PAGES[path];
     if (!data) return; // no entry for this URL — do nothing
 
@@ -968,7 +986,7 @@
     var root = document.getElementById('ws-levels-root');
     if (!root || root.getAttribute('data-ws-done')) return;
     var warn = function (m) { try { console.warn('[ws-levels] ' + m); } catch (e) {} };
-    var styleName = styleForPath((window.location.pathname || '').replace(/\/$/, '').toLowerCase());
+    var styleName = styleForPath(stylePagePath());
     if (!styleName) return warn('no style mapped to ' + window.location.pathname);
     fetchPublicSlots().then(function (allSlots) {
       if (!allSlots) return warn('publicSchedule feed unavailable');
@@ -1125,7 +1143,7 @@ const WS_PRICE_TIERS = {
 
 const WS_STD_SESSIONS = 16;
 
-const WS_REG_URL = '/register/';
+const WS_REG_URL = 'https://www.shoonyadance.com/register/';
 
 const WS_SPRING_SCHEDULE_URL = 'https://classes.shoonyadance.com/schedule-spring-2026';
 
