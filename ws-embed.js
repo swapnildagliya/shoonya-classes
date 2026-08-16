@@ -221,7 +221,7 @@
   // 3- and 5-session packs instead of single drop-ins. Same Zoho workshop form
   // for all three — the pack/event is selected inside the form.
   // NB: Zoho lists these under "Festivals & Events" (no native drop-in type yet).
-  var DROPIN_URL = 'https://creatorapp.zohopublic.eu/developer_shoonyadance/shoonya-dance-studio/form-perma/Workshop_Registration_Form/uOO7GVYHQEJn5dSVDz7z1nTXXeEfD0AZ4PJvtQJ0ZbMRum3tBX30zxQHC02n9b3bvTO6ORFDsVCfS4bJQF1VOZdBMZquYuPb4xx8';
+  var DROPIN_URL = 'https://links.shoonyadance.com/go/workshop/';
   var DROPIN_PACKS = [
     { label: '3 sessions', price: '€40.50' },
     { label: '5 sessions', price: '€67.50' }
@@ -1151,7 +1151,7 @@ const WS_SPRING_NOTE = null;
 
 const WS_SEMESTER_DATES = 'Sep 14 – Jan 30';
 
-const WS_ZOHO_STARTER_URL = 'https://creatorapp.zohopublic.eu/developer_shoonyadance/shoonya-dance-studio/form-perma/Workshop_Registration_Form/uOO7GVYHQEJn5dSVDz7z1nTXXeEfD0AZ4PJvtQJ0ZbMRum3tBX30zxQHC02n9b3bvTO6ORFDsVCfS4bJQF1VOZdBMZquYuPb4xx8';
+const WS_ZOHO_STARTER_URL = 'https://links.shoonyadance.com/go/workshop/';
 
 const WS_DROPIN_URL = WS_ZOHO_STARTER_URL;
 
