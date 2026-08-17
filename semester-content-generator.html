@@ -3074,8 +3074,12 @@ function wsDropinSectionHtml(prefix, note, cfg) {
   const p = prefix;
   cfg = cfg || {};
   const packs = cfg.packs || WS_DROPIN_PACKS;
-  const label = cfg.label || 'Drop-in packs';
-  const cta   = cfg.cta   || 'Book drop-in pack →';
+  // 2026-08-17: customer-facing wording is "session pass", never "drop-in" / "losse les".
+  // These are 3- and 5-session packs (beurtenkaart), not turn-up-any-time drop-ins, and the
+  // old label mis-sold what is actually bought. CSS class names keep the `dropin` stem on
+  // purpose — they are internal identifiers wired to WS_STYLE_DATA and the pasted blocks.
+  const label = cfg.label || 'Session passes';
+  const cta   = cfg.cta   || 'Book a session pass →';
   const url   = cfg.url   || WS_DROPIN_URL;
   const tiles = packs.map(pk =>
     `<div class="${p}-dropin-pack"><div class="${p}-dropin-sessions">${pk.n}</div><div class="${p}-dropin-price">${pk.price}</div></div>`
