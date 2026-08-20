@@ -375,7 +375,7 @@
       also:  [['Dance & Fit','Wednesday · Open'],['Yoga','Tue & Wed · Open'],['Raqs Sharqi','Monday · L1/L2/L3']]
     },
     '/dance-fit-gent': {
-      wear:  'Comfortable sportswear. Indoor shoes or barefoot.',
+      wear:  'Comfortable sportswear. Smooth-soled dance shoes, socks, or barefoot — no outside shoes.',
       bring: 'Water bottle. Small hand towel for sweat.',
       dropinPacks: {
         note:  'Prefer flexibility? Choose any dates from the schedule above and come for 3 or 5 sessions — no semester commitment needed.',

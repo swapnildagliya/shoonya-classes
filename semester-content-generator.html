@@ -1355,6 +1355,10 @@ const WS_STYLE_DATA = {
       'Contemporary': 'Join a professional yet pressure-free contemporary class designed for professional and semi-professional dancers. Our focus is to stay in shape and refine technique in a warm, welcoming environment. Beyond the structured training, there will be space to explore and connect with your own personal movement.',
       'Ballet': 'Join a professional yet pressure-free classical ballet class designed for professional and semi-professional dancers. Our focus is to stay in shape and refine technique in a warm, welcoming environment. Beyond the structured training, there will be space to explore and connect with your own personal movement.'
     },
+    // Tono is abroad 9 → 25 Sep, so his classes cannot run in the 14–19 Sep trial
+    // week. Swapnil's call 2026-08-16: the FIRST session of each of his weekdays
+    // (Mon 28 Sep, Thu 1 Oct) is a free trial class instead. Drives wsTrialPillHtml.
+    trialFirstClass: true,
     passPricing: {
       // packs omitted on purpose — the renderer defaults to WS_PASS_PACKS, which
       // is declared further down the file. Referencing it here would evaluate
@@ -1987,7 +1991,7 @@ const WS_STYLE_DATA = {
         bio: 'Badriyah is a professional Raqs Sharqi dancer (bellydancer), devoted mainly to Egyptian classical and folkloric styles, modern fusion and the Golden Age of belly dance. Badriyah has won several important awards - she was awarded as silver Belly Dancer of the Universe 2012 (California, USA), Vice Miss Bellydancer of Europe 2011 (Germany) and bronze Bellydancer of the Universe 2011 (California, USA). The biggest achievement of her dance career is performing for 6 years with Bellydance Evolution, led by the famous Jillina. She has performed in Japan, Hong Kong, USA, Taiwan, Australia, Morocco, Greece and other countries.<br><br>Her biggest passion is the history of Raqs Sharqi. She is a collector of vintage items depicting Egyptian dancers, and she is the organizer of Kan Zaman - The Golden Era Music & Dance Festival. She runs an online Raqs Sharqi Museum, and she plans to turn it into a physical museum based in Ghent.<br><br>Personally, the most wonderful thing for her is to see her students grow and fall in love with dance, no matter which forms the dance has.',
         social: [{ type:'website', url:'https://www.badriyahbellydance.com', label:'badriyahbellydance.com' },{ type:'instagram', url:'https://www.instagram.com/lenka_badriyah', label:'@lenka_badriyah' },{ type:'facebook', url:'https://www.facebook.com/lenkabadriyahdance', label:'Facebook' },{ type:'youtube', url:'https://www.youtube.com/@Badriyah_bellydance', label:'YouTube' }] }
     ],
-    wear: 'Comfortable sportswear. Indoor shoes or barefoot.',
+    wear: 'Comfortable sportswear. Smooth-soled dance shoes, socks, or barefoot — no outside shoes.',
     bring: 'Water bottle. Small hand towel for sweat.',
     alsoStyles: [
       { name: 'Pilates for Dancers', slug: '/pilates-voor-dansers-gent',      meta: 'Tue & Wed · Open' },
@@ -1996,6 +2000,12 @@ const WS_STYLE_DATA = {
     ]
   },
   'Bachata Solo Style': {
+    // 10-week miniseries starting 8 Oct — after the 14–19 Sep trial week, so it
+    // gets its own free first class instead (Swapnil, 2026-08-16). No pass model
+    // here, and the choreography builds week to week, so the note frames it as a
+    // look before committing rather than an open drop-in (Swapnil, 2026-08-16).
+    trialFirstClass: true,
+    trialFirstClassNote: 'Try week 1 before committing to the series.',
     hook: 'Styling, expression, and footwork — the individual vocabulary that makes your Bachata unmistakably yours.',
     photo: 'https://images.squarespace-cdn.com/content/v1/643161d3f0077c58bb466e03/e9835450-0f01-4de7-bc68-fd2c0940fb4f/Ioanna+Petta.jpg',
     teacherBio: 'Ioanna is a qualified instructor in international Latin and ballroom styles through professional academies. Her background includes 9 years of ballet and contemporary dance training. She co-teaches alongside Alex and leads the Bachata Solo Style mini-series.',
@@ -2312,13 +2322,70 @@ function wsSectionLabelHtml(text, color) {
 }
 
 // Free trial week banner (deletable after Sep 19)
-function wsTrialPillHtml() {
+// Trial week for the classes that start with the term. A class that starts LATER
+// cannot be tried in this window — see wsTrialPillHtml below.
+const WS_TRIAL_WEEK = { end: '2026-09-19', label: '14–19 September' };
+
+// The pill was hardcoded to the trial week and rendered on every page, including
+// classes that do not exist yet in that week: Tono Ferriol's mornings start 28 Sep
+// / 1 Oct (he is abroad until 25 Sep), so his page was advertising a trial he could
+// not teach. Tono spotted it himself, 2026-08-16.
+// Now, for a style whose first session falls after the trial week:
+//   • `trialFirstClass: true` in WS_STYLE_DATA → pill names ITS OWN first session
+//     per weekday, which is that class's free trial (Swapnil, 2026-08-16 — free,
+//     no booking step, every weekday's first session counts).
+//   • not opted in → NO pill at all. Never advertise a trial week the class cannot
+//     honour, but never invent a free class either: whether to give one away is an
+//     operational call per class, not something a date comparison should decide.
+//     (Bachata Solo Style also starts late — it deliberately shows no pill.)
+// A style with no dates in the feed keeps the standard trial-week pill.
+function wsTrialPillHtml(style, wsData) {
+  const DAY_ORDER = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const SHORT  = { Monday:'Mon', Tuesday:'Tue', Wednesday:'Wed', Thursday:'Thu',
+                   Friday:'Fri', Saturday:'Sat', Sunday:'Sun' };
+  // First session per weekday, across every level of this style.
+  const firstByDay = {};
+  ((style && style.levels) || []).forEach(lv => (lv.slots || []).forEach(s => {
+    const d = (s.dates || [])[0];
+    if (!d || !s.day) return;
+    if (!firstByDay[s.day] || d < firstByDay[s.day]) firstByDay[s.day] = d;
+  }));
+  const days = Object.keys(firstByDay).sort((a, b) => DAY_ORDER.indexOf(a) - DAY_ORDER.indexOf(b));
+  const earliest = days.length ? days.map(d => firstByDay[d]).sort()[0] : null;
+  const startsLate = earliest && earliest > WS_TRIAL_WEEK.end;
+
+  // Starts late and not opted in → render nothing rather than a trial it cannot honour.
+  if (startsLate && !(wsData && wsData.trialFirstClass)) return '';
+
+  let title, sub;
+  if (startsLate) {
+    const fmt = iso => { const p = iso.split('-'); return SHORT[days.find(d => firstByDay[d] === iso)] + ' ' + (+p[2]) + ' ' + MONTHS[+p[1] - 1]; };
+    const list = days.map(d => fmt(firstByDay[d]));
+    title = 'Free trial class · ' + (list.length > 1
+      ? list.slice(0, -1).join(', ') + ' &amp; ' + list[list.length - 1]
+      : list[0]);
+    // What they do AFTER the free class depends on how the class is sold — a pass
+    // style says "pick a pass", a miniseries has no pass to pick. Override per
+    // class with `trialFirstClassNote` when neither default fits.
+    const after = (wsData && wsData.trialFirstClassNote)
+      || (wsData && wsData.passPricing ? 'Come once, then pick a pass.'
+                                       : 'Come once, then sign up for the rest of the series.');
+    // Plural only when the style actually runs on more than one weekday — Tono's
+    // page covers four classes across two days, Bachata Solo Style is one Thursday.
+    sub = (days.length > 1 ? 'These classes start' : 'This class starts')
+        + ' after the trial week — your first class is free, no registration needed. ' + after;
+  } else {
+    title = 'Free trial week · ' + WS_TRIAL_WEEK.label;
+    sub = 'Drop in to any class, no registration needed — subject to availability';
+  }
+
   return `<link href="https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <div style="display:flex;align-items:center;gap:1rem;border-left:4px solid #D85A30;padding:.85rem 1.25rem;background:#FAECE7;border-radius:0 10px 10px 0;">
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D85A30" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
   <div>
-    <div style="font-size:.85rem;font-weight:700;color:#4A1B0C;font-family:'PT Serif',serif;line-height:1.4;">Free trial week · 14–19 September</div>
-    <div style="font-size:.75rem;color:#993C1D;font-family:'PT Serif',serif;margin-top:.1rem;line-height:1.4;">Drop in to any class, no registration needed — subject to availability</div>
+    <div style="font-size:.85rem;font-weight:700;color:#4A1B0C;font-family:'PT Serif',serif;line-height:1.4;">${title}</div>
+    <div style="font-size:.75rem;color:#993C1D;font-family:'PT Serif',serif;margin-top:.1rem;line-height:1.4;">${sub}</div>
   </div>
 </div>`;
 }
@@ -3655,7 +3722,7 @@ function renderWebsiteSection(style) {
   // NOTE: do NOT gate this on passPricing. A class pass does not exclude a trial
   // week — that was a wrong inference (Swapnil, 2026-08-11). Whether to advertise
   // a trial is an operational call per class, not a property of the pricing model.
-  const trialPillHtml    = wsTrialPillHtml();
+  const trialPillHtml    = wsTrialPillHtml(style, wsData);
   const levelsHtml       = wsLevelsHtml(style, wsData.descriptionsByLevel || null, wsData);
   const practicalHtml    = wsPracticalHtml(style, prefix, wsData);
 
