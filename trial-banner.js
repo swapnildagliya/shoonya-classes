@@ -3,7 +3,7 @@
    run DEPLOY-classes.shoonyadance.com.command. */
 (function () {
   'use strict';
-  var D = {"openDoors":["2026-09-13","2027-01-31","2027-06-13"],"trialWeeks":[{"start":"2026-09-14","end":"2026-09-19"},{"start":"2027-02-15","end":"2027-02-20"}]};
+  var D = {"openDoors":["2026-09-13","2027-01-31","2027-06-13"],"trialWeeks":[{"start":"2026-09-14","end":"2026-09-19"},{"start":"2027-02-15","end":"2027-02-20"}],"eventUrls":{"2026-09-13":"https://www.shoonyadance.com/calendar/opendeurdag-gratis-dansen-gent-13-september","2026-09-14":"https://www.shoonyadance.com/calendar/free-trial-week-14-19-september"},"schedule":"https://schedule.shoonyadance.com/schedule-sep-2026/"};
   var el = document.getElementById('shoonya-trial');
   if (!el) return;
 
@@ -38,12 +38,19 @@
   //   4 whichever of {next door, next trial week} comes first · 5 nothing
   // Getting this order wrong showed a door four months out while a trial week was five
   // days away, and buried the live registration window behind a distant invite.
-  var head, body, sub = '';
+  // CTA per state. Where the event has a programme the schedule cannot show, link the event;
+  // otherwise link the timetable. Unknown date -> schedule, never a dead slug.
+  function ev(dt) {
+    var iso = dt.getFullYear() + '-' + ('0' + (dt.getMonth() + 1)).slice(-2) + '-' + ('0' + dt.getDate()).slice(-2);
+    return D.eventUrls[iso] || null;
+  }
+  var head, body, sub = '', href = D.schedule, label = 'See the schedule';
   if (today) {
     var wT = weekAfter(today);
     head = 'Open Door Day is <em>today</em>.';
     body = 'Free, no booking — just walk in.' + (wT ? ' And from <strong>' + fmt(wT.s, wT.e) + '</strong> every weekly class is free to try.' : '');
     sub  = 'Check the schedule, pick a class, and arrive 10 minutes early.';
+    if (ev(today)) { href = ev(today); label = "See today's programme"; }
   } else if (inWeek) {
     head = 'Missed the Open Door Day? Every class is still free this week.';
     body = 'Until <strong>' + fmt(inWeek.e) + '</strong>, every weekly class is free to try. No registration needed.';
@@ -61,10 +68,12 @@
       body = 'Open Door Day is <strong>' + fmt(next) + '</strong> — free, no booking, just walk in.' +
              (wN ? ' Then from <strong>' + fmt(wN.s, wN.e) + '</strong> every weekly class is free to try.' : '');
       sub  = 'Check the schedule, pick your class, and arrive 10 minutes early.';
+      if (ev(next)) { href = ev(next); label = 'See the Open Door programme'; }
     } else {
       head = 'Try any class for free.';
       body = 'Every weekly class is free to try from <strong>' + fmt(upcoming.s, upcoming.e) + '</strong>. No registration needed.';
       sub  = (next ? 'Next Open Door Day: ' + fmt(next) + '. ' : '') + 'Check the schedule and arrive 10 minutes early.';
+      if (ev(upcoming.s)) { href = ev(upcoming.s); label = 'How the trial week works'; }
     }
   } else {
     return; // nothing truthful left to say
@@ -85,5 +94,5 @@
 
   el.innerHTML = '<div class="st"><p class="st-h">' + head + '</p><p class="st-b">' + body +
     (sub ? '<span class="st-s">' + sub + '</span>' : '') + '</p>' +
-    '<a class="st-c" href="https://schedule.shoonyadance.com/schedule-sep-2026/">See the schedule →</a></div>';
+    '<a class="st-c" href="' + href + '">' + label + ' →</a></div>';
 })();
