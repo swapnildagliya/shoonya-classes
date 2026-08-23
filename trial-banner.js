@@ -71,7 +71,10 @@
   }
 
   var s = document.createElement('style');
-  s.textContent = '#shoonya-trial .st{border:1px solid #E0CCF8;background:#F7F1FF;border-radius:10px;padding:1.25rem 1.5rem;margin:1.5rem 0;font-family:inherit}' +
+// max-width keeps the measure readable: on the homepage the section is 1200px+ wide, which
+  // ran the body text to ~158 characters a line (comfortable is 65-75). Centred so it sits
+  // with the page's centred sections instead of stranded against the left edge.
+  s.textContent = '#shoonya-trial .st{border:1px solid #E0CCF8;background:#F7F1FF;border-radius:10px;padding:1.35rem 1.6rem;margin:1.5rem auto;max-width:40rem;font-family:inherit}' +
     '#shoonya-trial .st-h{font-size:1.05rem;font-weight:700;color:#4A2A75;margin:0 0 .5rem;line-height:1.3}' +
     '#shoonya-trial .st-h em{font-style:normal;color:#B564F7}' +
     '#shoonya-trial .st-b{font-size:.95rem;color:#333;line-height:1.6;margin:0}' +
