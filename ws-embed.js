@@ -633,6 +633,81 @@
     } catch (e) {}
   }
 
+  // ── #register hero-anchor repair ──────────────────────────────────────────
+  // The hero CTA links to #register but the jump did nothing — on EVERY style
+  // page, not just Oriental Flow. Two independent causes, both verified live
+  // 2026-09-13 on /oriental-flow-gent and /kathak-danslessen-in-gent:
+  //
+  // 1. target="_blank" on the button (Squarespace's "Open in new window" is
+  //    checked in the block editor). A same-page anchor with target=_blank does
+  //    not scroll — it opens a SECOND TAB at <path>#register.
+  // 2. Duplicate id. Squarespace renders the header nav FOLDER whose URL slug is
+  //    /register as <div class='header-nav-folder-content' id='register'>, and
+  //    it renders that header twice (desktop + mobile copies). So the document
+  //    holds THREE #register elements; the two nav ones are display:none, zero
+  //    height, at y=0, and they come BEFORE the page content. The browser
+  //    anchors to the FIRST match, so even in the new tab the page sits at the
+  //    top. document.getElementById('register') returns a DIV, not the section.
+  //
+  // Section ID = register is therefore unusable on www while that folder exists,
+  // and the folder slug cannot change: /register IS the real registration page,
+  // linked from every generated block and from semester-config.json.
+  //
+  // Fix without touching Squarespace, and without re-iding anything (custom CSS
+  // or another block may key on the section id): strip the stray target, and
+  // intercept the click to scroll to section[id='register'] ourselves — the nav
+  // duplicates are DIVs, so that selector is unambiguous. A #register hash that
+  // arrived in the URL is honoured once on load for the same reason.
+  var _regWired = false;
+
+  function registerSection() {
+    return document.querySelector('section[id="register"]');
+  }
+
+  function fixRegisterAnchor() {
+    try {
+      var sec = registerSection();
+      if (!sec) return;
+
+      // Read .hash/.pathname off the <a> element, not the raw attribute: the
+      // browser resolves them, so '#register', '/oriental-flow-gent#register'
+      // and the absolute URL all match, while another page's #register never does.
+      var links = document.querySelectorAll('a[href*="#register"]'), i;
+      for (i = 0; i < links.length; i++) {
+        if (links[i].hash !== '#register') continue;
+        if (links[i].pathname !== location.pathname) continue;
+        links[i].removeAttribute('target');
+        links[i].removeAttribute('rel');
+      }
+
+      if (!_regWired) {
+        _regWired = true;
+        document.addEventListener('click', function (ev) {
+          try {
+            if (ev.defaultPrevented || ev.button || ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) return;
+            var a = ev.target && ev.target.closest && ev.target.closest('a[href*="#register"]');
+            if (!a || a.hash !== '#register' || a.pathname !== location.pathname) return;
+            var target = registerSection();
+            if (!target) return;   // nothing to scroll to: let the browser do whatever it does
+            ev.preventDefault();
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // replaceState, not the hash itself: setting location.hash would send
+            // the browser back to the hidden nav div we are working around.
+            if (history.replaceState) history.replaceState(null, '', '#register');
+          } catch (e) {}
+        }, true);
+      }
+
+      // Arrived with #register already in the URL (a shared link, a bookmark, or
+      // the extra tab the target=_blank button used to open): the browser has
+      // already anchored to the hidden nav div, so do the jump ourselves, once.
+      if (location.hash === '#register' && !fixRegisterAnchor._jumped) {
+        fixRegisterAnchor._jumped = true;
+        sec.scrollIntoView(true);
+      }
+    } catch (e) {}
+  }
+
   // ── Add-to-calendar buttons ───────────────────────────────────────────────
   // Adds direct-download .ics buttons under each date-list block. The style
   // pages already group classes by day (Mon/Wed/Thu cards, one date list each),
@@ -857,14 +932,18 @@
     // ordering matters. injectLevelsBlock re-runs the calendar pass itself once it has painted.
     injectLevelsBlock();
     repairHeroRegisterLinks();
+    fixRegisterAnchor();
     // Hide expired seasonal notes now and on a few delayed passes (the static
     // spring-note block is a separate Squarespace code block, injected async).
     hideExpiredSpringNotes();
     injectCalendarButtons();
     injectCourseSchema();
     setTimeout(repairHeroRegisterLinks, 500);
+    setTimeout(fixRegisterAnchor, 500);
     setTimeout(repairHeroRegisterLinks, 1500);
+    setTimeout(fixRegisterAnchor, 1500);
     setTimeout(repairHeroRegisterLinks, 3000);
+    setTimeout(fixRegisterAnchor, 3000);
     setTimeout(hideExpiredSpringNotes, 500);
     setTimeout(hideExpiredSpringNotes, 1500);
     setTimeout(hideExpiredSpringNotes, 3000);

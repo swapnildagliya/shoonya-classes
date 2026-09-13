@@ -3804,6 +3804,8 @@ function renderWebsiteSection(style) {
       <div id="ws-levels-html" class="ws-code-area" style="max-height:360px;">${escHtml(levelsHtml)}</div>
       <div class="ws-note-box" style="margin-top:.5rem;">
         Set Section ID = <code>register</code> in Squarespace (Edit Section → Section ID) so the hero CTA button's <code>#register</code> link works.
+        On the hero button, leave <strong>&ldquo;Open in new window&rdquo; UNCHECKED</strong> &mdash; <code>target=_blank</code> on a same-page anchor opens a second tab instead of scrolling.
+        The native jump alone is not enough on www: the header nav folder with slug <code>/register</code> renders a hidden <code>id=&quot;register&quot;</code> twice, ahead of the page, so the browser anchors to that instead. <code>ws-embed.js</code> repairs both (<code>fixRegisterAnchor</code>) &mdash; the Section ID still has to be set.
         Each code block includes a Google Fonts <code>&lt;link&gt;</code> — keep only <strong>one</strong> per page (e.g. in the Teacher block); remove duplicates from Levels and Practical blocks after pasting.
         ${!levels.length ? '<br><strong>⚠ No level data yet</strong> — teacher needs to submit a weekly class form first.' : ''}
         ${layout === 'day' ? '<br><strong>Day-based layout</strong> — ≥5 levels or back-to-back same day. Each card = one day of the week.' : ''}
