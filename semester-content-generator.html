@@ -3151,9 +3151,13 @@ function wsDropinSectionHtml(prefix, note, cfg) {
   const tiles = packs.map(pk =>
     `<div class="${p}-dropin-pack"><div class="${p}-dropin-sessions">${pk.n}</div><div class="${p}-dropin-price">${pk.price}</div></div>`
   ).join('');
+  // 2026-09-16 (Swapnil): a 3/5-session pass is bound to ONE class and expires at the end of the
+  // semester it was bought in. Stated on every session-pass block so the question does not reach the
+  // inbox. Pro-training class passes (cfg.label set) run on their own terms and do not get it.
+  const validity = cfg.label ? '' : ' A pass is valid for this class only, until the end of the current semester.';
   return `<div class="${p}-dropin-section">
             <div><p class="${p}-dropin-label">${label}</p>
-            <p class="${p}-dropin-note">${note || WS_DROPIN_NOTE}</p></div>
+            <p class="${p}-dropin-note">${note || WS_DROPIN_NOTE}${validity}</p></div>
             <div class="${p}-dropin-packs">${tiles}</div>
             <a class="${p}-dropin-register dropin-register" href="${url}" target="_blank" rel="noopener">${cta}</a>
           </div>`;
