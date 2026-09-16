@@ -1109,7 +1109,7 @@
       "passPricing": {
         "label": "Class passes",
         "cta": "Book a pass →",
-        "note": "One pass, all four classes — spend it on ballet, contemporary, or any mix of the two. No semester commitment. In the registration form choose <strong>Festivals &amp; Events</strong>, then this class, then your pass size."
+        "note": "One pass, all four classes — spend it on ballet, contemporary, or any mix of the two. No semester commitment. A pass is valid until the end of this term. In the registration form choose <strong>Festivals &amp; Events</strong>, then this class, then your pass size."
       },
       "mergeStyles": [
         {
