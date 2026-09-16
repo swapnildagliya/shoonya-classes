@@ -1117,7 +1117,8 @@
           "teacher": "Tono Ferriol",
           "label": "Ballet"
         }
-      ]
+      ],
+      "trialFirstClass": true
     },
     "Kizomba": {
       "partnerRequired": true,
@@ -1202,6 +1203,10 @@
       "dropinDays": [
         "Wednesday"
       ]
+    },
+    "Bachata Solo Style": {
+      "trialFirstClass": true,
+      "trialFirstClassNote": "Try week 1 before committing to the series."
     },
     "Oriental Flow": {
       "descriptionsByLevel": {
@@ -1390,13 +1395,55 @@ function wsClassifyLayout(levels) {
   return 'per-level';
 }
 
-function wsTrialPillHtml() {
+const WS_TRIAL_WEEK = { end: '2026-09-19', label: '14–19 September' };
+
+function wsTrialPillHtml(style, wsData) {
+  const DAY_ORDER = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const SHORT  = { Monday:'Mon', Tuesday:'Tue', Wednesday:'Wed', Thursday:'Thu',
+                   Friday:'Fri', Saturday:'Sat', Sunday:'Sun' };
+  // First session per weekday, across every level of this style.
+  const firstByDay = {};
+  ((style && style.levels) || []).forEach(lv => (lv.slots || []).forEach(s => {
+    const d = (s.dates || [])[0];
+    if (!d || !s.day) return;
+    if (!firstByDay[s.day] || d < firstByDay[s.day]) firstByDay[s.day] = d;
+  }));
+  const days = Object.keys(firstByDay).sort((a, b) => DAY_ORDER.indexOf(a) - DAY_ORDER.indexOf(b));
+  const earliest = days.length ? days.map(d => firstByDay[d]).sort()[0] : null;
+  const startsLate = earliest && earliest > WS_TRIAL_WEEK.end;
+
+  // Starts late and not opted in → render nothing rather than a trial it cannot honour.
+  if (startsLate && !(wsData && wsData.trialFirstClass)) return '';
+
+  let title, sub;
+  if (startsLate) {
+    const fmt = iso => { const p = iso.split('-'); return SHORT[days.find(d => firstByDay[d] === iso)] + ' ' + (+p[2]) + ' ' + MONTHS[+p[1] - 1]; };
+    const list = days.map(d => fmt(firstByDay[d]));
+    title = 'Free trial class · ' + (list.length > 1
+      ? list.slice(0, -1).join(', ') + ' &amp; ' + list[list.length - 1]
+      : list[0]);
+    // What they do AFTER the free class depends on how the class is sold — a pass
+    // style says "pick a pass", a miniseries has no pass to pick. Override per
+    // class with `trialFirstClassNote` when neither default fits.
+    const after = (wsData && wsData.trialFirstClassNote)
+      || (wsData && wsData.passPricing ? 'Come once, then pick a pass.'
+                                       : 'Come once, then sign up for the rest of the series.');
+    // Plural only when the style actually runs on more than one weekday — Tono's
+    // page covers four classes across two days, Bachata Solo Style is one Thursday.
+    sub = (days.length > 1 ? 'These classes start' : 'This class starts')
+        + ' after the trial week — your first class is free, no registration needed. ' + after;
+  } else {
+    title = 'Free trial week · ' + WS_TRIAL_WEEK.label;
+    sub = 'Drop in to any class, no registration needed — subject to availability';
+  }
+
   return `<link href="https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <div style="display:flex;align-items:center;gap:1rem;border-left:4px solid #D85A30;padding:.85rem 1.25rem;background:#FAECE7;border-radius:0 10px 10px 0;">
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D85A30" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
   <div>
-    <div style="font-size:.85rem;font-weight:700;color:#4A1B0C;font-family:'PT Serif',serif;line-height:1.4;">Free trial week · 14–19 September</div>
-    <div style="font-size:.75rem;color:#993C1D;font-family:'PT Serif',serif;margin-top:.1rem;line-height:1.4;">Drop in to any class, no registration needed — subject to availability</div>
+    <div style="font-size:.85rem;font-weight:700;color:#4A1B0C;font-family:'PT Serif',serif;line-height:1.4;">${title}</div>
+    <div style="font-size:.75rem;color:#993C1D;font-family:'PT Serif',serif;margin-top:.1rem;line-height:1.4;">${sub}</div>
   </div>
 </div>`;
 }
