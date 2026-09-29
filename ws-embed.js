@@ -59,7 +59,6 @@
     'Yoga':                    '/yoga-lessen-in-gent',
     'Indian Dance Technique':  '/indian-dance-in-belgium',
     'Pilates for Dancers':     '/pilates-voor-dansers-gent',
-    'Dance & Fit':             '/dance-fit-gent',
     'Bachata Solo Style':      '/bachata-solo-style-gent',
     'Oriental Flow':           '/oriental-flow-gent'
   };
@@ -217,7 +216,7 @@
   }
 
   // ── Drop-in packs ─────────────────────────────────────────────────────────
-  // The casual-attendance classes (Pilates, Dance & Fit, Wednesday Yoga) offer
+  // The casual-attendance classes (Pilates, Wednesday Yoga) offer
   // 3- and 5-session packs instead of single drop-ins. Same Zoho workshop form
   // for all three — the pack/event is selected inside the form.
   // NB: Zoho lists these under "Festivals & Events" (no native drop-in type yet).
@@ -263,7 +262,7 @@
     '/professional-morning-training-gent': {
       wear:  'Whatever you feel comfortable moving in — this is a space to just be yourself. Socks or bare feet; whatever you are used to. No street shoes in the studio.',
       bring: 'Water bottle. Small hand towel for sweat.',
-      also:  [['Ballet','Mon & Thu mornings · Int/Adv'],['Pilates for Dancers','Tue & Wed · Open'],['Yoga','Tue & Wed · Open']]
+      also:  [['Ballet','Mon & Thu mornings · Int/Adv'],['Pilates for Dancers','Tuesday · Open'],['Yoga','Tue & Wed · Open']]
     },
     '/ballet-voor-volwassenen-in-gent': {
       wear:  'Comfortable, form-fitting dancewear. Ballet shoes or socks — no street shoes in the studio.',
@@ -357,7 +356,7 @@
         packs: DROPIN_PACKS,
         url:   DROPIN_URL
       },
-      also:  [['Indian Dance Technique','Tuesday · Open'],['Bollyfolk','Tuesday · Open'],['Pilates for Dancers','Tue & Wed · Open']]
+      also:  [['Indian Dance Technique','Tuesday · Open'],['Bollyfolk','Tuesday · Open'],['Pilates for Dancers','Tuesday · Open']]
     },
     '/indian-dance-in-belgium': {
       wear:  'Comfortable dancewear. Come barefoot — no shoes in Studio Aakash.',
@@ -372,17 +371,7 @@
         packs: DROPIN_PACKS,
         url:   DROPIN_URL
       },
-      also:  [['Dance & Fit','Wednesday · Open'],['Yoga','Tue & Wed · Open'],['Raqs Sharqi','Monday · L1/L2/L3']]
-    },
-    '/dance-fit-gent': {
-      wear:  'Comfortable sportswear. Smooth-soled dance shoes, socks, or barefoot — no outside shoes.',
-      bring: 'Water bottle. Small hand towel for sweat.',
-      dropinPacks: {
-        note:  'Prefer flexibility? Choose any dates from the schedule above and come for 3 or 5 sessions — no semester commitment needed.',
-        packs: DROPIN_PACKS,
-        url:   DROPIN_URL
-      },
-      also:  [['Pilates for Dancers','Tue & Wed · Open'],['Raqs Sharqi','Monday · L1/L2/L3'],['Yoga','Tue & Wed · Open']]
+      also:  [['Yoga','Tue & Wed · Open'],['Raqs Sharqi','Monday · L1/L2/L3']]
     },
     '/bachata-solo-style-gent': {
       wear:  'Indoor dance shoes with suede or smooth leather soles — or socks.',
@@ -1195,13 +1184,7 @@
     },
     "Pilates for Dancers": {
       "dropinDays": [
-        "Tuesday",
-        "Wednesday"
-      ]
-    },
-    "Dance & Fit": {
-      "dropinDays": [
-        "Wednesday"
+        "Tuesday"
       ]
     },
     "Bachata Solo Style": {
@@ -1268,7 +1251,7 @@ const WS_SEO = {
   'Solo Jazz':             { title: 'Solo Jazz Dance Classes in Ghent | Shoonya Dance Centre',         description: 'Solo Jazz in Ghent — Harlem steps, swing vocabulary and improvisation with the Upside Down team. Open level, no experience needed. September 2026, Gent.' },
   'Jazzy Workout':         { title: 'Jazzy Workout Classes in Ghent | Shoonya Dance Centre',           description: 'Jazzy Workout in Ghent — jazz dance and swing movement in a feel-good fitness class. Taught by the Upside Down team. No partner needed, all levels welcome.' },
   'Tap Dance':             { title: 'Tap Dance Classes in Ghent | Shoonya Dance Centre',               description: 'Tap dance classes in Ghent with Tapdance Promotion — Lut Vermeulen and team. Levels 1–4, home of the annual Ghent Tap Festival. Register September 2026.' },
-  'Raqs Sharqi':           { title: 'Belly Dance Classes in Ghent | Shoonya Dance Centre',             description: 'Raqs Sharqi (belly dance) in Ghent with Lenka Badriyah — Silver Belly Dancer of the Universe 2012. Egyptian classical bellydance, all levels. September 2026.' },
+  'Raqs Sharqi':           { title: 'Belly Dance Classes in Ghent | Shoonya Dance Centre',             description: 'Raqs Sharqi (belly dance) in Ghent with Lenka Badriyah, Silver Belly Dancer of the Universe 2012, and Nathalie El Ghoul. Egyptian classical bellydance, levels 1–3. September 2026.' },
   'African Congolese Dance':{ title: 'African Dance Classes in Ghent | Shoonya Dance Centre',          description: 'Congolese traditional dance and Congolese Rumba in Ghent with Joseph Simako Said — choreographer from DR Congo. Body rhythm, energy, and community spirit.' },
   'Burlesque':             { title: 'Burlesque Classes in Ghent | Shoonya Dance Centre',               description: 'Burlesque performance classes in Ghent for adults 18+. Stage presence, storytelling and confidence with Zoe Bizoe, Hendrik Lebon and Tine De Pauw.' },
   'Cissy Ball':            { title: 'Cissy Ball Classes in Ghent | Shoonya Dance Centre',              description: 'Cissy Ball in Ghent — dance from your inner joy with Hendrik Lebon. No steps to memorise, no counts. Performance skills and pure expression for all levels.' },
@@ -1279,7 +1262,6 @@ const WS_SEO = {
   'Yoga':                  { title: 'Yoga Classes in Ghent | Shoonya Dance Centre',                   description: 'Yoga classes in Ghent for dancers and non-dancers. Iyengar-lineage practice taught by Swapnil Dagliya, certified yoga teacher since 2011, Pune.' },
   'Indian Dance Technique':{ title: 'Indian Dance Technique in Ghent | Shoonya Dance Centre',         description: 'Indian Dance Technique in Ghent — foundation of Indian classical and folk dance. Vocabulary, posture, and coordination. Open level, Shoonya Dance Centre.' },
   'Pilates for Dancers':   { title: 'Pilates for Dancers in Ghent | Shoonya Dance Centre',            description: 'Pilates for Dancers in Ghent with Lenka Badriyah. Core stability, joint mobility, and deep strength for movers of all backgrounds. Shoonya Dance Centre.' },
-  'Dance & Fit':           { title: 'Dance & Fit Classes in Ghent | Shoonya Dance Centre',            description: 'Dance & Fit in Ghent with Lenka Badriyah — energetic dance fitness for all levels. Morning classes that set you up for the day. No experience needed.' },
   'Bachata Solo Style':  { title: 'Bachata Solo Style in Ghent | Shoonya Dance Centre',           description: 'Bachata Solo Style classes in Ghent with Ioanna — 10-session miniseries, October to December. Body movement, arm styling, and footwork. No partner needed. All genders welcome.' },
   'Oriental Flow':         { title: 'Oriental Flow Classes in Ghent | Shoonya Dance Centre',          description: 'Oriental Flow in Ghent — traditional Middle Eastern dance meets contemporary movement. Taught by Nathalie El Ghoul, dance artist with 30+ years experience.' },
 };
@@ -1730,7 +1712,7 @@ function wsLevelsHtml(style, descsByLevel, wsData) {
   };
   const semesterTagDays = allDays.map(d => wsShortDay(d) + ' ' + (_slotsByDay[d] ? _timeLabel(_slotsByDay[d]) : 'evenings')).join(' + ');
 
-  // Drop-in styles (Pilates / Dance & Fit / Wed Yoga) render one card per day-slot.
+  // Drop-in styles (Pilates / Wed Yoga) render one card per day-slot.
   // Pass-priced styles reuse the drop-in day-card machinery: every day they run on
   // is a "pass day", so each slot gets its own card and ONE shared pass table
   // renders below them (the pass is spendable across all of them).
