@@ -1365,7 +1365,7 @@ const WS_STYLE_DATA = {
       // inside its temporal dead zone and throw before WS_STYLE_DATA is built.
       label: 'Class passes',
       cta:   'Book a pass →',
-      note:  'One pass covers Tono’s four morning classes — spend it on ballet, contemporary, or any mix of the two. It does not cover other ballet classes at Shoonya. No semester commitment. A pass is valid until the end of this term. In the registration form choose <strong>Festivals &amp; Events</strong>, then this class, then your pass size.'
+      note:  'One pass covers Tono’s Monday and Thursday morning Ballet classes, 10:00–11:15. Contemporary is cancelled from 15 October 2026. Existing purchases are preserved. <strong>All current PMT passes are valid until 10 December 2026.</strong> Choose a pass you can use within the remaining class dates.'
     },
     // 2026-08-11: the Summer Intensive was cancelled and its page removed, so the
     // old workshop-hosted URL 404s and the card rendered a broken image. Re-hosted
@@ -1872,7 +1872,6 @@ const WS_STYLE_DATA = {
     ]
   },
   'Bhangra': {
-    starterSeries: { label: '4-Week Starter Series', sessions: 4 },   // still runs — Swapnil 2026-08-12
     hook: 'The most exuberant folk dance of Punjab — big arms, big energy, and a beat you can\'t resist.',
     photo: 'https://images.squarespace-cdn.com/content/v1/643161d3f0077c58bb466e03/36f8a145-1fb0-4be8-97ba-9d39fb70e349/20240602-015.jpg',
     teacherLabel: 'Swapnil Dagliya',
@@ -1897,7 +1896,6 @@ const WS_STYLE_DATA = {
     ]
   },
   'Indian Semi-Classical': {
-    starterSeries: { label: '4-Week Starter Series', sessions: 4 },   // still runs — Swapnil 2026-08-12
     hook: 'Classical Indian dance vocabulary — Kathak footwork, expressive gestures, and stories told through movement.',
     photo: 'https://images.squarespace-cdn.com/content/v1/643161d3f0077c58bb466e03/29b6fe81-f8f8-4cfb-b111-aa04259cbac2/Swapnil-31.jpg',
     teacherLabel: 'Swapnil Dagliya',
@@ -1923,7 +1921,7 @@ const WS_STYLE_DATA = {
   },
   'Yoga': {
     hook: 'A grounded, movement-based yoga practice for dancers and non-dancers alike.',
-    dropinDays: ['Wednesday'],   // Wed Yoga has drop-in packs; Tue is semester-only
+    dropinDays: ['Tuesday', 'Wednesday'],   // Owner confirmed 2026-10-14: yoga passes cover both days
     photo: 'https://images.squarespace-cdn.com/content/v1/643161d3f0077c58bb466e03/caac7860-3825-4aef-8f7e-eb3dd133c181/Dihp+yoga_Original.jpg',
     teacherLabel: 'Swapnil Dagliya',
     teacherOrigin: 'Pune, India / Ghent, Belgium',
@@ -2316,7 +2314,7 @@ function wsSectionLabelHtml(text, color) {
 // Free trial week banner (deletable after Sep 19)
 // Trial week for the classes that start with the term. A class that starts LATER
 // cannot be tried in this window — see wsTrialPillHtml below.
-const WS_TRIAL_WEEK = { end: '2026-09-19', label: '14–19 September' };
+const WS_TRIAL_WEEK = { end: '2027-02-20', label: '15–20 February 2027' };   // next trial week; roll forward each semester
 
 // The pill was hardcoded to the trial week and rendered on every page, including
 // classes that do not exist yet in that week: Tono Ferriol's mornings start 28 Sep
@@ -3146,7 +3144,7 @@ function wsDropinSectionHtml(prefix, note, cfg) {
   // 2026-09-16 (Swapnil): a 3/5-session pass is bound to ONE class and expires at the end of the
   // semester it was bought in. Stated on every session-pass block so the question does not reach the
   // inbox. Pro-training class passes (cfg.label set) run on their own terms and do not get it.
-  const validity = cfg.label ? '' : ' A pass is valid for this class only, until the end of the current semester.';
+  const validity = cfg.label ? '' : (cfg.validity || ' A pass is valid for this class only, until the end of the current semester.');
   return `<div class="${p}-dropin-section">
             <div><p class="${p}-dropin-label">${label}</p>
             <p class="${p}-dropin-note">${note || WS_DROPIN_NOTE}${validity}</p></div>
@@ -3320,8 +3318,16 @@ function wsDayCard(dayName, dayLevels, meta, prefix, descs) {
   const timeRange = `${firstSlot.start || ''}–${lastSlot.end || ''}`;
   const teacherAnchor = (firstSlot.teacher || '').toLowerCase().split(' ')[0] || 'teacher';
 
+  // Month span from this card's own dates — was hardcoded "Sep–Jan", which printed
+  // on Bachata Solo Style (8 Oct – 17 Dec) until 2026-09-28.
+  const _fsMonths = (() => {
+    const ds = [...(firstSlot.dates || [])].sort();
+    if (!ds.length) return 'Sep–Jan';
+    const m = d => ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][new Date(d + 'T12:00:00').getMonth()];
+    return m(ds[0]) === m(ds[ds.length - 1]) ? m(ds[0]) : m(ds[0]) + '–' + m(ds[ds.length - 1]);
+  })();
   const datesHtml = (firstSlot.dates && firstSlot.dates.length)
-    ? `<details class="${p}-date-list"><summary>${dayLevels[0].lv.sessionCount || 14} sessions · Sep–Jan · see all dates</summary>
+    ? `<details class="${p}-date-list"><summary>${dayLevels[0].lv.sessionCount || 14} sessions · ${_fsMonths} · see all dates</summary>
           <div class="${p}-date-grid" translate="no">${wsDateGridHtml(firstSlot.dates, p)}</div>
         </details>`
     : '';
@@ -3354,30 +3360,7 @@ function wsLevelsHtml(style, descsByLevel, wsData) {
   const meta   = style.meta   || {};
   let   levels = Array.isArray(style.levels) ? style.levels : [];
 
-  // ── Starter Series ────────────────────────────────────────────────────────
-  // A 4-week on-ramp sold alongside the semester course (Bhangra EUR 50, ISC EUR 58).
-  // It is NOT a level in the sheet, so it has to be synthesised: same day / time /
-  // teacher / studio as the style's first slot, the first `sessions` dates of that
-  // slot, and the standard tier prorated 4/16 — which is exactly where 50 and 58 come
-  // from, so nothing is hardcoded.
-  //
-  // Restored 2026-08-12. It had vanished from both the generator and the feed while the
-  // offering was still running and still advertised in the pages' own About text; the
-  // pasted blocks were the only place it survived. Confirmed still running by Swapnil.
-  // `isStarterSeries` is keyed on /starter/i in the level name, so the label must
-  // contain the word "Starter".
-  const _starter = wsData && wsData.starterSeries;
-  if (_starter && levels.length) {
-    const _base = (levels[0].slots || [])[0];
-    if (_base) {
-      const _n = _starter.sessions || 4;
-      levels = levels.concat([{
-        level: _starter.label || (_n + '-Week Starter Series'),
-        sessionCount: _n,
-        slots: [Object.assign({}, _base, { dates: (_base.dates || []).slice(0, _n) })]
-      }]);
-    }
-  }
+  // Starter Series discontinued (Swapnil 2026-10-05: "We don't want any new ones") — not synthesised.
   const _descs = (descsByLevel && Object.keys(descsByLevel).length ? descsByLevel : null) || meta.descByLevel || {};
   const p      = wsMakePrefix(style.name);
   // Pass-priced styles always render per-level (one card per day-slot) so each
@@ -3416,7 +3399,7 @@ function wsLevelsHtml(style, descsByLevel, wsData) {
   };
   const semesterTagDays = allDays.map(d => wsShortDay(d) + ' ' + (_slotsByDay[d] ? _timeLabel(_slotsByDay[d]) : 'evenings')).join(' + ');
 
-  // Drop-in styles (Pilates / Wed Yoga) render one card per day-slot.
+  // Session-pass styles (Pilates / Yoga) render one card per day-slot.
   // Pass-priced styles reuse the drop-in day-card machinery: every day they run on
   // is a "pass day", so each slot gets its own card and ONE shared pass table
   // renders below them (the pass is spendable across all of them).
@@ -3439,9 +3422,9 @@ function wsLevelsHtml(style, descsByLevel, wsData) {
   let dropinBelowHtml = '';   // shared drop-in section rendered below the cards (multi-day drop-in styles)
   if (layout === 'per-level' && _dropinDays) {
     // Drop-in styles: one card per day-slot.
-    // • Single drop-in day (e.g. Wed Yoga): drop-in block under that day's card,
+    // • Single pass day (e.g. Pilates Tuesday): pass block under that day's card,
     //   "Semester registration only" note on the others.
-    // • Multiple drop-in days (e.g. Pilates Tue+Wed): ONE shared drop-in section
+    // • Multiple pass days (e.g. Yoga Tue+Wed): ONE shared pass section
     //   below both cards — the pack covers any day, so don't repeat it per card.
     const _tod = s => { const h = parseInt((s.start || '0').split(':')[0]); return h < 12 ? 'morning' : h < 17 ? 'afternoon' : 'evening'; };
     const _multiDropin = _dropinDays.length > 1;
@@ -3460,7 +3443,10 @@ function wsLevelsHtml(style, descsByLevel, wsData) {
           // Pass/merged pages carry more than one style, so the card title leads
           // with the level label; drop-in pages keep the plain "Monday morning".
           title: (_passCfg && lv.level ? lv.level + ' · ' : '') + (s.day || '') + ' ' + _tod(s),
-          dropinHtml: (!_passCfg && !_multiDropin && isDropin) ? wsDropinSectionHtml(p) : '',
+          dropinHtml: (!_passCfg && !_multiDropin && isDropin)
+            // 2026-09-29 (Swapnil): name the day — a pass only covers this slot's day.
+            ? wsDropinSectionHtml(p, 'Prefer flexibility? Pick any 3 or 5 ' + s.day + ' sessions from the schedule above — no semester commitment needed.')
+            : '',
           semesterOnly: (!_passCfg && !_multiDropin && !isDropin),
           passOnly: !!_passCfg
         }));
@@ -3479,7 +3465,7 @@ function wsLevelsHtml(style, descsByLevel, wsData) {
     } else if (_multiDropin) {
       const _note = 'Prefer flexibility? Come to any ' + _dropinDays.join(' or ') +
         ' session — pick 3 or 5 dates, no semester commitment needed.';
-      dropinBelowHtml = '\n  <div style="max-width:640px;margin:1.5rem auto 0;">' + wsDropinSectionHtml(p, _note) + '</div>';
+      dropinBelowHtml = '\n  <div style="max-width:640px;margin:1.5rem auto 0;">' + wsDropinSectionHtml(p, _note, style.name === 'Yoga' ? { validity: ' A pass is valid for Tuesday and Wednesday yoga only, until the end of the current semester.' } : undefined) + '</div>';
     }
   } else if (layout === 'per-level') {
     cardsHtml = levels.map((lv, i) => {
@@ -3686,9 +3672,11 @@ function renderWebsiteSection(style) {
     (displayTeacher || teacherName || '?').toUpperCase()
   ];
   // Drop-in styles flag it in the facts line — day-aware: "(WED)" only when not
-  // every day of the style is drop-in (e.g. Yoga is Tue-semester + Wed-dropin).
+  // every day of the style accepts passes.
   const _heroDropinDays = (wsData.dropinDays || []);
-  if (wsData.passPricing) {
+  if (style.name === 'Yoga') {
+    factsParts.push('SESSION PASSES (TUE + WED)');
+  } else if (wsData.passPricing) {
     factsParts.push('CLASS PASSES');
   } else if (_heroDropinDays.length) {
     const _allDropin = allDays.length && allDays.every(d => _heroDropinDays.includes(d));
@@ -3697,7 +3685,13 @@ function renderWebsiteSection(style) {
   }
   const factsLine = factsParts.filter(Boolean).join(' · ');
   const hookLine = wsData.hook || '[One-sentence hook — what makes this style worth trying?]';
-  const heroNative = `${style.name}\n\n${factsLine}\n\n${hookLine}\n\n[Button] REGISTER FOR SEP 2026 ↓ → #register`;
+  // Button month = this style's first class date, not the semester start. A class
+  // that starts later (Bachata Solo Style, 8 Oct) otherwise says "SEP".
+  const _heroFirst = [...new Set(allSlots.flatMap(s => s.dates || []))].sort()[0];
+  const _heroMonth = _heroFirst
+    ? new Date(_heroFirst + 'T12:00:00').toLocaleString('en', { month: 'short' }).toUpperCase() + ' ' + _heroFirst.slice(0, 4)
+    : 'SEP 2026';
+  const heroNative = `${style.name}\n\n${factsLine}\n\n${hookLine}\n\n[Button] REGISTER FOR ${_heroMonth} ↓ → #register`;
 
   // About native copy.
   // Priority: WS_STYLE_DATA (curated generic) > teacher profile > flat-sheet fallback.

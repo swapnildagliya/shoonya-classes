@@ -1160,17 +1160,9 @@
       "teacherLabel": "Swapnil Dagliya"
     },
     "Bhangra": {
-      "starterSeries": {
-        "label": "4-Week Starter Series",
-        "sessions": 4
-      },
       "teacherLabel": "Swapnil Dagliya"
     },
     "Indian Semi-Classical": {
-      "starterSeries": {
-        "label": "4-Week Starter Series",
-        "sessions": 4
-      },
       "teacherLabel": "Swapnil Dagliya"
     },
     "Yoga": {
@@ -1617,8 +1609,16 @@ function wsDayCard(dayName, dayLevels, meta, prefix, descs) {
   const timeRange = `${firstSlot.start || ''}–${lastSlot.end || ''}`;
   const teacherAnchor = (firstSlot.teacher || '').toLowerCase().split(' ')[0] || 'teacher';
 
+  // Month span from this card's own dates — was hardcoded "Sep–Jan", which printed
+  // on Bachata Solo Style (8 Oct – 17 Dec) until 2026-09-28.
+  const _fsMonths = (() => {
+    const ds = [...(firstSlot.dates || [])].sort();
+    if (!ds.length) return 'Sep–Jan';
+    const m = d => ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][new Date(d + 'T12:00:00').getMonth()];
+    return m(ds[0]) === m(ds[ds.length - 1]) ? m(ds[0]) : m(ds[0]) + '–' + m(ds[ds.length - 1]);
+  })();
   const datesHtml = (firstSlot.dates && firstSlot.dates.length)
-    ? `<details class="${p}-date-list"><summary>${dayLevels[0].lv.sessionCount || 14} sessions · Sep–Jan · see all dates</summary>
+    ? `<details class="${p}-date-list"><summary>${dayLevels[0].lv.sessionCount || 14} sessions · ${_fsMonths} · see all dates</summary>
           <div class="${p}-date-grid" translate="no">${wsDateGridHtml(firstSlot.dates, p)}</div>
         </details>`
     : '';
