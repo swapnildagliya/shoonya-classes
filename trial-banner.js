@@ -3,7 +3,7 @@
    run DEPLOY-classes.shoonyadance.com.command. */
 (function () {
   'use strict';
-  var D = {"openDoors":["2026-09-13","2027-01-31","2027-06-13"],"trialWeeks":[{"start":"2026-09-14","end":"2026-09-19"},{"start":"2027-02-15","end":"2027-02-20"}],"eventUrls":{"2026-09-13":"https://www.shoonyadance.com/calendar/opendeurdag-gratis-dansen-gent-13-september","2026-09-14":"https://www.shoonyadance.com/calendar/free-trial-week-14-19-september"},"schedule":"https://schedule.shoonyadance.com/schedule-sep-2026/"};
+  var D = {"openDoors":["2026-09-13","2027-01-31","2027-06-13"],"trialWeeks":[{"start":"2026-09-14","end":"2026-09-19"},{"start":"2027-02-15","end":"2027-02-20"}],"eventUrls":{"2026-09-13":"https://www.shoonyadance.com/calendar/opendeurdag-gratis-dansen-gent-13-september","2026-09-14":"https://www.shoonyadance.com/calendar/free-trial-week-14-19-september"},"schedule":"https://schedule.shoonyadance.com/schedule-sep-2026/","trialPage":"https://www.shoonyadance.com/try-a-class"};
   var el = document.getElementById('shoonya-trial');
   if (!el) return;
 
@@ -44,7 +44,7 @@
     var iso = dt.getFullYear() + '-' + ('0' + (dt.getMonth() + 1)).slice(-2) + '-' + ('0' + dt.getDate()).slice(-2);
     return D.eventUrls[iso] || null;
   }
-  var head, body, sub = '', href = D.schedule, label = 'See the schedule';
+  var head, body, sub = '', href = D.trialPage, label = 'Learn how trials work';   // 15 Nov: default goes to the trial page, not the September timetable (Codex review)
   if (today) {
     var wT = weekAfter(today);
     head = 'Open Door Day is <em>today</em>.';
