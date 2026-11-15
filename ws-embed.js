@@ -899,6 +899,56 @@
     } catch (e) {}
   }
 
+  // ── Approved teacher bios (from the app) ──────────────────────────────────
+  // Block Studio's teacher cards tag the short bio and the "Read full bio" text with
+  // data-teacher-bio="<slug>" data-bio="short|long". When the app serves an approved bio for
+  // that slug, it replaces the hand-written text on the page; no pasting needed when a
+  // teacher edits their bio. Any failure (feed down, slow, empty, bad JSON, no match, empty
+  // field) leaves the hand-written text exactly as it is. Text only: nothing from the feed is
+  // ever parsed as HTML.
+  var BIO_FEED = 'https://portal.shoonyadance.com/api/public/teacher-bios';
+  var _bioStarted = false;
+
+  function applyTeacherBios(data) {
+    var list = data && data.teachers;
+    if (!list || typeof list.length !== 'number') return;
+    var bySlug = {};
+    for (var i = 0; i < list.length; i++) {
+      if (list[i] && typeof list[i].slug === 'string') bySlug[list[i].slug] = list[i];
+    }
+    var nodes = document.querySelectorAll('[data-teacher-bio]');
+    for (var n = 0; n < nodes.length; n++) {
+      var el = nodes[n];
+      var t = bySlug[el.getAttribute('data-teacher-bio')];
+      if (!t) continue;
+      var isLong = el.getAttribute('data-bio') === 'long';
+      var text = isLong ? t.bio_long : t.bio_short;
+      if (typeof text !== 'string' || !text.replace(/\s+/g, '')) continue;
+      while (el.firstChild) el.removeChild(el.firstChild);
+      var paras = isLong ? text.split(/\n\s*\n/) : [text];
+      for (var k = 0; k < paras.length; k++) {
+        if (k) { el.appendChild(document.createElement('br')); el.appendChild(document.createElement('br')); }
+        el.appendChild(document.createTextNode(paras[k].replace(/^\s+|\s+$/g, '')));
+      }
+    }
+  }
+
+  // One request per page, and only when a tagged card exists. Called again on the delayed
+  // passes in init() because Squarespace injects code blocks asynchronously.
+  function loadTeacherBios() {
+    if (_bioStarted || typeof fetch !== 'function') return;
+    if (!document.querySelector('[data-teacher-bio]')) return;
+    _bioStarted = true;
+    try {
+      var ctl = (typeof AbortController === 'function') ? new AbortController() : null;
+      var timer = setTimeout(function () { if (ctl) try { ctl.abort(); } catch (e) {} }, 4000);
+      fetch(BIO_FEED, ctl ? { signal: ctl.signal } : undefined)
+        .then(function (r) { clearTimeout(timer); return r.ok ? r.json() : null; })
+        .then(applyTeacherBios)
+        .catch(function () { clearTimeout(timer); });
+    } catch (e) {}
+  }
+
   // ── Entry point ───────────────────────────────────────────────────────────
   // Squarespace injects code blocks asynchronously, so #ws-prac-root may not
   // exist when DOMContentLoaded fires. Poll until it appears (max 3 seconds).
@@ -939,6 +989,10 @@
     setTimeout(injectCalendarButtons, 600);
     setTimeout(injectCalendarButtons, 1600);
     setTimeout(injectCalendarButtons, 3200);
+    loadTeacherBios();
+    setTimeout(loadTeacherBios, 500);
+    setTimeout(loadTeacherBios, 1500);
+    setTimeout(loadTeacherBios, 3000);
     // If a root div wasn't in the DOM yet, poll every 100ms until it appears.
     //
     // ⚠️ #ws-levels-root MUST be polled for, exactly like #ws-prac-root. Squarespace injects
