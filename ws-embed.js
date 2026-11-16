@@ -1986,7 +1986,7 @@ ${cardsHtml}  </div>${dropinBelowHtml}
     var L=Math.max(lo,16), W=Math.min(hi-lo,window.innerWidth-2*L); geo={L:L,W:W,hero:secs[0]};
     secs.slice(1).forEach(function(s){ var k=(s===about)?'about':kind(s); if(!k||found[k]) return; found[k]=1;
       var d=document.createElement('div'); d.className='sdc-sec-label'; d.id='sdc-sec-'+k; d.style.marginLeft=L+'px'; d.style.width=W+'px';
-      var sp=document.createElement('span'); sp.style.background=LAB[k][2]; dual(sp,LAB[k][0],LAB[k][1]); d.appendChild(sp); s.parentNode.insertBefore(d,s); });
+      var sp=document.createElement('span'); sp.style.background=LAB[k][2]; if(LAB[k][2]==='#B564F7'){sp.style.color='#fff'; sp.style.fontWeight='700'; sp.style.fontSize='13px';} dual(sp,LAB[k][0],LAB[k][1]); d.appendChild(sp); s.parentNode.insertBefore(d,s); });
     return true;
   }
   function moveCard(){
