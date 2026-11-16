@@ -834,12 +834,12 @@
 
   function injectCourseSchema() {
     try {
-      if (_courseDone || document.getElementById('wsep-course-jsonld')) return;
+      if (_courseDone || document.getElementById('wsep-course-jsonld') || document.documentElement.classList.contains('sdc-native')) return;   // new-look pages carry their own spring Course graph in the block (audit 16 Nov)
       var path = stylePagePath();
       var styleName = styleForPath(path);
       if (!styleName) return;
       fetchSchedule().then(function (slots) {
-        if (_courseDone || document.getElementById('wsep-course-jsonld') || !slots) return;
+        if (_courseDone || document.getElementById('wsep-course-jsonld') || document.documentElement.classList.contains('sdc-native') || !slots) return;
         var mine = slots.filter(function (s) { return sameStyle(s.style, styleName); });
         if (!mine.length) return;
         mine.sort(function (a, b) { return (DAY_ORDER[a.day] || 9) - (DAY_ORDER[b.day] || 9) || hhmm(a.start).localeCompare(hhmm(b.start)); });
