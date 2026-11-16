@@ -1982,8 +1982,8 @@ ${cardsHtml}  </div>${dropinBelowHtml}
   function labels(){
     var secs=[].slice.call(document.querySelectorAll('.page-section')); if(secs.length<3) return false;
     var about=null; if(!kind(secs[1])) about=secs[1];
-    var ref=(about||secs[1]).querySelector('.sqs-block')||(about||secs[1]).querySelector('.content-wrapper')||secs[1]; var r=ref.getBoundingClientRect();
-    var L=Math.max(r.left,16), W=Math.min(r.width,window.innerWidth-2*L); geo={L:L,W:W,hero:secs[0]};
+    var bl=[].slice.call((about||secs[1]).querySelectorAll('.sqs-block')), lo=1e9, hi=0; bl.forEach(function(b){var q=b.getBoundingClientRect(); if(q.width<40) return; lo=Math.min(lo,q.left); hi=Math.max(hi,q.right);}); if(!bl.length||hi<=lo){var q0=((about||secs[1]).querySelector('.content-wrapper')||secs[1]).getBoundingClientRect(); lo=q0.left; hi=q0.right;}
+    var L=Math.max(lo,16), W=Math.min(hi-lo,window.innerWidth-2*L); geo={L:L,W:W,hero:secs[0]};
     secs.slice(1).forEach(function(s){ var k=(s===about)?'about':kind(s); if(!k||found[k]) return; found[k]=1;
       var d=document.createElement('div'); d.className='sdc-sec-label'; d.id='sdc-sec-'+k; d.style.marginLeft=L+'px'; d.style.width=W+'px';
       var sp=document.createElement('span'); sp.style.background=LAB[k][2]; dual(sp,LAB[k][0],LAB[k][1]); d.appendChild(sp); s.parentNode.insertBefore(d,s); });
