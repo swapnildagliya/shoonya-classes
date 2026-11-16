@@ -1975,7 +1975,7 @@ ${cardsHtml}  </div>${dropinBelowHtml}
 // ─── NATIVE LOOK layout (owner 16 Nov 2026): on pages whose style block sets html.sdc-native, move the facts card under the hero and put a labelled rule above every section.
 (function(){
   var LAB={about:['About this style','Over de stijl','#F2B8B4'],classes:['Classes & dates','Lessen & data','#B564F7'],teachers:['Teachers','Docenten','#FFCF5A'],events:['Coming up','Binnenkort','#FFCF5A'],practical:['Practical','Praktisch','#F2B8B4']};
-  var JUMP=[['about','About','Over'],['teachers','Teachers','Docenten'],['classes','Classes & dates','Lessen & data'],['events','Coming up','Binnenkort'],['practical','Practical','Praktisch']];
+  var JUMP=[['teachers','Teachers','Docenten'],['classes','Classes & dates','Lessen & data'],['events','Coming up','Binnenkort'],['practical','Practical','Praktisch']];
   function dual(el,en,nl){ el.setAttribute('data-wg-notranslate',''); var a=document.createElement('span'); a.className='ca-en'; a.textContent=en; var b=document.createElement('span'); b.className='ca-nl'; b.textContent=nl; el.appendChild(a); el.appendChild(b); }
   var n=0,labelled=false,moved=false,geo=null,found={};
   function kind(s){ if(s.querySelector('.td-av')) return 'teachers'; if(s.querySelector('#sdcblk')) return 'classes'; if(s.querySelector('.summary-block-wrapper')) return 'events'; if(s.querySelector('#ws-prac-root,.wsep-prac')) return 'practical'; return null; }
