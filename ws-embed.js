@@ -907,6 +907,11 @@
   // field) leaves the hand-written text exactly as it is. Text only: nothing from the feed is
   // ever parsed as HTML.
   var BIO_FEED = 'https://portal.shoonyadance.com/api/public/teacher-bios';
+  // Photos (16 Nov 2026): <img data-teacher-photo="<slug>"> gets the teacher's MAIN photo from the same feed
+  // (photo_url, a stable app URL). Only that app path is ever used as a src. The hand-placed image stays as the
+  // fallback: no feed, no photo, or the new picture failing to load puts the old src back. The block's own
+  // object-position crop is not touched.
+  var PHOTO_PREFIX = 'https://portal.shoonyadance.com/api/public/teacher-photo/';
   var _bioStarted = false;
 
   function applyTeacherBios(data) {
@@ -915,6 +920,18 @@
     var bySlug = {};
     for (var i = 0; i < list.length; i++) {
       if (list[i] && typeof list[i].slug === 'string') bySlug[list[i].slug] = list[i];
+    }
+    var imgs = document.querySelectorAll('img[data-teacher-photo]');
+    for (var m = 0; m < imgs.length; m++) {
+      var img = imgs[m], pt = bySlug[img.getAttribute('data-teacher-photo')], url = pt && pt.photo_url;
+      if (typeof url !== 'string' || url.indexOf(PHOTO_PREFIX) !== 0 || img.getAttribute('data-photo-swapped')) continue;
+      (function (el, u) {
+        var old = el.getAttribute('src');
+        el.setAttribute('data-photo-swapped', '1');
+        el.addEventListener('error', function () { if (el.getAttribute('src') === u && old) el.setAttribute('src', old); });
+        el.removeAttribute('srcset');
+        el.setAttribute('src', u);
+      })(img, url);
     }
     var nodes = document.querySelectorAll('[data-teacher-bio]');
     for (var n = 0; n < nodes.length; n++) {
@@ -937,7 +954,7 @@
   // passes in init() because Squarespace injects code blocks asynchronously.
   function loadTeacherBios() {
     if (_bioStarted || typeof fetch !== 'function') return;
-    if (!document.querySelector('[data-teacher-bio]')) return;
+    if (!document.querySelector('[data-teacher-bio], img[data-teacher-photo]')) return;
     _bioStarted = true;
     try {
       var ctl = (typeof AbortController === 'function') ? new AbortController() : null;
@@ -1978,7 +1995,7 @@ ${cardsHtml}  </div>${dropinBelowHtml}
   var JUMP=[['teachers','Teachers','Docenten'],['classes','Classes & dates','Lessen & data'],['events','Coming up','Binnenkort'],['practical','Practical','Praktisch']];
   function dual(el,en,nl){ el.setAttribute('data-wg-notranslate',''); var a=document.createElement('span'); a.className='ca-en'; a.textContent=en; var b=document.createElement('span'); b.className='ca-nl'; b.textContent=nl; el.appendChild(a); el.appendChild(b); }
   var n=0,labelled=false,moved=false,geo=null,found={};
-  function kind(s){ if(s.querySelector('.td-av')) return 'teachers'; if(s.querySelector('#sdcblk')) return 'classes'; if(s.querySelector('.summary-block-wrapper')) return 'events'; if(s.querySelector('#ws-prac-root,.wsep-prac')) return 'practical'; return null; }
+  function kind(s){ if(s.querySelector('.td-av,.b-ted,.b-sc')) return 'teachers'; if(s.querySelector('#sdcblk')) return 'classes'; if(s.querySelector('.summary-block-wrapper')) return 'events'; if(s.querySelector('#ws-prac-root,.wsep-prac')) return 'practical'; return null; }
   function labels(){
     var secs=[].slice.call(document.querySelectorAll('.page-section')); if(secs.length<3) return false;
     var about=null; if(!kind(secs[1])) about=secs[1];
