@@ -2049,7 +2049,7 @@ ${cardsHtml}  </div>${dropinBelowHtml}
       var hd=document.createElement('div'); hd.className='hd'; dual(hd,'Good to know','Goed om te weten'); panel.appendChild(hd);
       items.forEach(function(it){
         var st=it.querySelector&&it.querySelector('.wsep-pi-text strong');
-        if(st){ var n=st.nextSibling; if(n&&n.nodeType===3) n.nodeValue=n.nodeValue.replace(/^\s*[\u2014\u2013-]\s*/,''); }
+        if(st){ var n=st.nextSibling; if(n&&n.nodeType===3) n.nodeValue=n.nodeValue.replace(/^\s*[\u2014\u2013-]\s*/,'').replace(/^([a-z])/,function(c){return c.toUpperCase();}); }
         panel.appendChild(it); });
       var row=null, rows=[].slice.call(document.querySelectorAll('#sdcblk .sdc-p-next .ca-row'));
       for(var i=0;i<rows.length;i++){ if(rows[i].querySelectorAll('.ca-grid .ca-card').length<=3){ row=rows[i]; break; } }
