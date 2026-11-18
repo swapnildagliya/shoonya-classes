@@ -2083,7 +2083,11 @@ ${cardsHtml}  </div>${dropinBelowHtml}
       else { var host=document.querySelector('#sdcblk .sdc-p-next .ca-spring')||document.querySelector('#sdcblk .sdc-p-next'); if(host){ panel.className+=' sdc-gtk-below'; host.appendChild(panel); } }
     }
     // keep the same guidance under the current term too (the first panel is only inside 'next semester')
-    try{ var nowP=document.querySelector('#sdcblk .sdc-p-now'), src=document.getElementById('sdc-gtk'); if(nowP&&src){ var c2=src.cloneNode(true); c2.removeAttribute('id'); c2.className='sdc-gtk sdc-gtk-below'; nowP.appendChild(c2); watchGtk(c2); } }catch(e){}
+    try{ var nowP=document.querySelector('#sdcblk .sdc-p-now'), src=document.getElementById('sdc-gtk'); if(nowP&&src){ var c2=src.cloneNode(true); c2.removeAttribute('id'); c2.className='sdc-gtk sdc-gtk-below'; nowP.appendChild(c2); watchGtk(c2);
+      // 18 Nov review P1: the clone is made before Weglot translates the original, so the NL 'Dit semester' tab kept English. Re-copy the original's content whenever it changes (Weglot swaps its text nodes after load / on the NL switch).
+      var syncT=null, syncNow=function(){ try{ if(!c2.isConnected) return; var h=src.innerHTML; if(c2.__sdcSrc===h) return; c2.__sdcSrc=h; c2.innerHTML=h; var ids=c2.querySelectorAll('[id]'); for(var k=0;k<ids.length;k++) ids[k].removeAttribute('id'); }catch(e){} };
+      new MutationObserver(function(){ clearTimeout(syncT); syncT=setTimeout(syncNow,150); }).observe(src,{childList:true,characterData:true,subtree:true,attributes:true});
+      setTimeout(syncNow,600); } }catch(e){}
     // the old Practical section: gone, unless it still holds a shoe guide (Argentine Tango)
     if(sec){ if(hasShoes){ pr.classList.add('sdc-lite'); } else { sec.style.display='none'; } }
     return true;
